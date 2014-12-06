@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Thermal printer char generator</title>
+		<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+		<meta name = "viewport" content = "initial-scale = 1.0, user-scalable = no">
+		<link rel="shortcut icon" href="./favicon.ico" />
+		<style type="text/css">
+		html, body {
+			overflow:hidden;
+			width:100%;
+			height:100%;
+			margin:0;
+			padding:0;
+			font-family: Trebuchet MS,Arial,sans-serif;
+		}
+		body {
+			font: 86 % Arial, "Helvetica Neue", sans - serif;
+			color:#000000;
+			margin: 0;                
+		}
+		</style>
+		
+		<script type="text/javascript" src="js/swfobject.js"></script>
+		<script type="text/javascript" src="js/swffit.js"></script>
+    </head>
+    <body>
+		<div id="content1">
+		<div id="content">
+			<p>In order to view this page you need JavaScript and Flash Player 11+ support!</p>
+			<a href="http://get.adobe.com/fr/flashplayer/">Install flash</a>
+		</div>
+		</div>
+		
+		<script type="text/javascript">
+			var flashvars = {};
+			var version = "1.0";
+			flashvars["version"] = version;
+			flashvars["configXml"] = "./xml/config.xml?v=" + version;
+			
+			var attributes = {};
+			attributes["id"] = "externalDynamicContent";
+			attributes["name"] = "externalDynamicContent";
+			
+			var params = {};
+			params['allowFullScreen'] = 'true';
+			params['allowFullScreenInteractive'] = 'true';
+			params['menu'] = 'false';
+			
+			var browserWinWidth = 0, browserWinHeight = 0;
+			if( typeof( window.innerWidth ) == 'number' ) {
+				//Non-IE
+				browserWinWidth = window.innerWidth;
+				browserWinHeight = window.innerHeight;
+			} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+				//IE 6+ in 'standards compliant mode'
+				browserWinWidth = document.documentElement.clientWidth;
+				browserWinHeight = document.documentElement.clientHeight;
+			} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+				//IE 4 compatible
+				browserWinWidth = document.body.clientWidth;
+				browserWinHeight = document.body.clientHeight;
+			}
+			if(browserWinHeight > 710) {
+				swfobject.embedSWF("swf/ThermalPrinterCharGen.swf?v="+version, "content", "100%", "100%", "11", "swf/expressinstall.swf", flashvars, params, attributes);
+			}else{
+				document.getElementsByTagName('html')[0].style.overflow = "auto";
+				document.getElementsByTagName('body')[0].style.overflow = "auto";
+				swfobject.embedSWF("swf/ThermalPrinterCharGen.swf?v=" + version, "content", "100%", "710", "11", "swf/expressinstall.swf", flashvars, params, attributes);
+			}
+			
+			//swffit.fit("externalDynamicContent", 800, 710, 2000, 2000, true, true);
+		</script>
+	</body>
+</html>

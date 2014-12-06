@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<styleSheets>
+		<styleSheet><![CDATA[{p_resourcesURL}css/flashstyles.css?v={v_version}]]></styleSheet>
+	</styleSheets>
+
+	<paths>	
+		<path code="baseURL"><![CDATA[]]></path>
+		<path code="resourcesURL"><![CDATA[./]]></path>
+	</paths>
+
+	<vars>
+		<var code="lang"><![CDATA[en]]></var><!-- default lang. Overriden by AS code -->
+	</vars>
+	
+	<fonts>
+		<font><![CDATA[{p_resourcesURL}fonts/HelveticaNeueLTStd-Lt.swf?v={v_version}]]></font>
+		<font><![CDATA[{p_resourcesURL}fonts/HelveticaNeueLTStd-Blk.swf?v={v_version}]]></font>
+		<font><![CDATA[{p_resourcesURL}fonts/HelveticaNeueLTStd-Cn.swf?v={v_version}]]></font>
+		<font><![CDATA[{p_resourcesURL}fonts/HelveticaNeueLTStd-Md.swf?v={v_version}]]></font>
+		<font><![CDATA[{p_resourcesURL}fonts/courier.swf?v={v_version}]]></font>
+	</fonts>
+
+	<labels>
+		<label code="userDefineCmd"><![CDATA[Add "enable user-define chars" commands]]></label>
+		<label code="charHeaderCmd"><![CDATA[Add char's headers command]]></label>
+		<label code="formatCode"><![CDATA[Format code]]></label>
+		<label code="hexaValues"><![CDATA[Hexadecimal values]]></label>
+		<label code="charToreplace"><![CDATA[Char index to edit (32 < n < 127 )]]></label>
+		<label code="copyData"><![CDATA[Copy code]]></label>
+		<label code="clearGrid"><![CDATA[Clear grid]]></label>
+	</labels>
+	
+	<dependencies>
+	</dependencies>
+</root>
