@@ -1,7 +1,8 @@
 package fr.durss.thermal.components {
+	import fr.durss.thermal.graphics.CheckBoxDefaultGraphic;
+	import fr.durss.thermal.graphics.CheckBoxSelectedGraphic;
+
 	import com.nurun.components.button.visitors.applyDefaultFrameVisitor;
-	import com.nurun.trombi.graphics.CheckBoxSelectedGraphic;
-	import com.nurun.trombi.graphics.CheckBoxDefaultGraphic;
 	import com.nurun.components.form.Checkbox;
 	
 	/**

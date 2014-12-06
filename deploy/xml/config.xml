@@ -29,6 +29,12 @@
 		<label code="charToreplace"><![CDATA[Char index to edit (32 < n < 127 )]]></label>
 		<label code="copyData"><![CDATA[Copy code]]></label>
 		<label code="clearGrid"><![CDATA[Clear grid]]></label>
+		<label code="minimizeParams"><![CDATA[Minimize parameters]]></label>
+		<label code="fontListTitle"><![CDATA[Font...]]></label>
+		<label code="generateChar"><![CDATA[Generate]]></label>
+		<label code="fontSizeTitle"><![CDATA[Size...]]></label>
+		<label code="defaultChar"><![CDATA[char...]]></label>
+		<label code="fontTypeTitle"><![CDATA[Style...]]></label>
 	</labels>
 	
 	<dependencies>

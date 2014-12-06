@@ -1,5 +1,4 @@
 package fr.durss.thermal.components {
-
 	import com.nurun.components.button.GraphicButton;
 	import com.nurun.components.button.visitors.FrameVisitor;
 

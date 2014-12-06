@@ -1,12 +1,14 @@
 package fr.durss.thermal.components {
+	import fr.durss.thermal.graphics.InputErrorGraphic;
+	import fr.durss.thermal.graphics.InputGraphic;
+
+	import com.nurun.components.form.Input;
+	import com.nurun.components.vo.Margin;
+
+	import flash.display.DisplayObject;
+	import flash.events.FocusEvent;
 	import flash.utils.clearTimeout;
 	import flash.utils.setTimeout;
-	import flash.display.DisplayObject;
-	import com.nurun.trombi.graphics.InputErrorGraphic;
-	import flash.events.FocusEvent;
-	import com.nurun.components.vo.Margin;
-	import com.nurun.trombi.graphics.InputGraphic;
-	import com.nurun.components.form.Input;
 	
 	/**
 	 * 
@@ -29,9 +31,9 @@ package fr.durss.thermal.components {
 		/**
 		 * Creates an instance of <code>TInput</code>.
 		 */
-		public function TInput(defaultLabel:String = "", regTest:RegExp = null) {
+		public function TInput(defaultLabel:String = "", css:String = "input", regTest:RegExp = null) {
 			_regTest = regTest;
-			super("input", new InputGraphic(), defaultLabel, "inputDefault", new Margin(4, 0, 4, 0));
+			super(css, new InputGraphic(), defaultLabel, "inputDefault", new Margin(4, 0, 4, 0));
 			if(regTest != null) {
 				_defaultSkin = background;
 				_errorSkin = new InputErrorGraphic();

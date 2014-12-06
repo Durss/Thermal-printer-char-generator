@@ -1,4 +1,6 @@
 package fr.durss.thermal {
+	import flash.filters.DropShadowFilter;
+	import com.nurun.components.form.events.FormComponentEvent;
 	import com.nurun.utils.math.MathUtils;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -32,8 +34,11 @@ package fr.durss.thermal {
 		private var _pressed:Boolean;
 		private var _bmd:BitmapData;
 		private var _bitmap:Bitmap;
-		private var _limits : Shape;
-		private var _form : FormPanel;
+		private var _limits:Shape;
+		private var _form:FormPanel;
+		private var _font : FontPanel;
+		private var _rightPressed : Boolean;
+		private var _dragOffset : Point;
 		
 		
 		
@@ -81,19 +86,28 @@ package fr.durss.thermal {
 			
 			_lastPos = new Point(int.MAX_VALUE,int.MAX_VALUE);
 			_currPos = new Point();
+			_dragOffset = new Point();
 			_pattern = new BitmapData(src.width, src.height, true,0);
 			_pattern.draw(src);
 			
 			_bitmap	= addChild(new Bitmap()) as Bitmap;
 			_grid	= addChild(new Sprite()) as Sprite;
 			_limits	= addChild(new Shape()) as Shape;
+			_font	= addChild(new FontPanel()) as FontPanel;
 			_form	= addChild(new FormPanel()) as FormPanel;
+			
+			_bitmap.filters = [new DropShadowFilter(0,0,0,.35,5,5,1,3)];
 			
 			stage.addEventListener(Event.RESIZE, computePositions);
 			_grid.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownGridhandler);
 			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
+			if(MouseEvent.RIGHT_MOUSE_UP != null) {
+				stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpHandler);
+				_grid.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, rightDownHandler);
+			}
 			addEventListener(Event.ENTER_FRAME, enterFrameHandler);
 			_form.addEventListener(Event.CLEAR, clearGridHandler);
+			_font.addEventListener(FormComponentEvent.SUBMIT, generateFromFontHandler);
 			computePositions();
 		}
 		
@@ -101,10 +115,14 @@ package fr.durss.thermal {
 		 * Resize and replace the elements.
 		 */
 		private function computePositions(event:Event = null):void {
+			graphics.clear();
+			graphics.beginFill(0xF5F5F5, 1);
+			graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
+			
 			_grid.graphics.clear();
 			_grid.graphics.beginBitmapFill(_pattern);
-			_grid.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
-			_bmd = new BitmapData(Math.ceil(stage.stageWidth/_cellSize), Math.ceil(stage.stageHeight/_cellSize));
+			_grid.graphics.drawRect(0, 0, 12 * _cellSize + 1, 3*8*_cellSize + 1);
+			_bmd = new BitmapData(Math.floor(_grid.width / _cellSize), Math.floor(_grid.height/ _cellSize), true, 0);
 			if(_bitmap.bitmapData != null) {
 				_bmd.draw(_bitmap.bitmapData);
 				_bitmap.bitmapData.dispose();
@@ -112,6 +130,13 @@ package fr.durss.thermal {
 			_bitmap.bitmapData = _bmd;
 			
 			_bitmap.scaleX = _bitmap.scaleY = _cellSize;
+			
+			_grid.x = _bitmap.x = Math.round((stage.stageWidth - _form.width - _grid.width) * .5);
+			_grid.y = _bitmap.y = Math.round((stage.stageHeight - _font.height - _grid.height) * .5) + _font.height;
+			
+			graphics.beginFill(0xffffff, 1);
+			graphics.drawRect(_grid.x, _grid.y, _grid.width, _grid.height);
+			
 			generateBin();
 		}
 		
@@ -129,13 +154,32 @@ package fr.durss.thermal {
 		private function mouseDownGridhandler(event:MouseEvent):void {
 			_pressed = true;
 		}
+		
+		/**
+		 * Called when right button is pressed
+		 */
+		private function rightDownHandler(event : MouseEvent) : void {
+			_rightPressed = true;
+			_dragOffset.x = _grid.mouseX;
+			_dragOffset.y = _grid.mouseY;
+		}
 
 		/**
 		 * Called when mouse is released
 		 */
 		private function mouseUpHandler(event:MouseEvent):void {
-			_pressed = false;
-			_lastPos.x = int.MAX_VALUE;
+			if(event.type == MouseEvent.MOUSE_UP){
+				 _pressed = false;
+				_lastPos.x = int.MAX_VALUE;
+			}else if(event.type == MouseEvent.RIGHT_MOUSE_UP){
+				_rightPressed = false;
+				//Crop bitmap when stoppping to drag it.
+				var copy:BitmapData = _bmd.clone();
+				_bmd.fillRect(_bmd.rect, 0);
+				_bmd.copyPixels(copy, copy.rect, new Point((_bitmap.x - _grid.x) / _cellSize, (_bitmap.y - _grid.y) / _cellSize));
+				computePositions();
+				generateBin();
+			}
 		}
 		
 		/**
@@ -157,6 +201,13 @@ package fr.durss.thermal {
 				
 				generateBin();
 			}
+			
+			if(_rightPressed) {
+				_bitmap.x = Math.floor((_grid.mouseX - _dragOffset.x)/_cellSize) * _cellSize + _grid.x;
+				_bitmap.y = Math.floor((_grid.mouseY - _dragOffset.y)/_cellSize) * _cellSize + _grid.y;
+			}
+			
+			_form.y = _font.height;
 		}
 		
 		/**
@@ -166,11 +217,15 @@ package fr.durss.thermal {
 			_limits.graphics.clear();
 			
 			//search for first pixel
-			var rect:Rectangle = _bmd.getColorBoundsRect(0xFFFFFFFF, 0xFFFF0000, true);
+			var rect:Rectangle = _bmd.getColorBoundsRect(0xffffffff, 0xFFFF0000, true);
+			rect.y = 0;
 			if (rect.width == 0 || rect.height == 0) {
 				//bug with getColorBoundsRect if top/left pixel is filled, it doesn't
 				//find it..
-				if(_bmd.getPixel32(0, 0) !== 0xffff0000) return;
+				if(_bmd.getPixel32(0, 0) !== 0xffff0000) {
+					_form.populate(new ByteArray(), rect.width, rect.height);
+					return;
+				}
 				else rect.width = rect.height = 1;
 			}
 			
@@ -179,10 +234,10 @@ package fr.durss.thermal {
 			
 			
 			_limits.graphics.beginFill(0xffffff, .8);
-			_limits.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
+			_limits.graphics.drawRect(_bitmap.x, _bitmap.y, _grid.width, _grid.height);
 			_limits.graphics.lineStyle(2, 0x0000cc);
-			_limits.graphics.drawRect(	rect.x * _cellSize,
-										rect.y * _cellSize,
+			_limits.graphics.drawRect(	rect.x * _cellSize + _bitmap.x,
+										rect.y * _cellSize + _bitmap.y,
 										rect.width * _cellSize + 1,
 										rect.height * _cellSize + 1);
 			
@@ -203,6 +258,20 @@ package fr.durss.thermal {
 			ba.writeByte(byte);
 			
 			_form.populate(ba, rect.width, rect.height);
+		}
+		
+		/**
+		 * Generates a char from an existing font
+		 */
+		private function generateFromFontHandler(event:FormComponentEvent):void {
+			_bmd.fillRect(_bmd.rect, 0);
+
+			var pos:Point = new Point();
+			pos.x = Math.round((_bmd.width - _font.bitmapData.width) * .5);
+			pos.y = Math.round((_bmd.height - _font.bitmapData.height) * .5);
+			_bmd.copyPixels(_font.bitmapData, _font.bitmapData.rect, pos);
+			
+			generateBin();
 		}
 		
 	}

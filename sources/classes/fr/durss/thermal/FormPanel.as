@@ -34,11 +34,12 @@ package fr.durss.thermal {
 		private var _width:int;
 		private var _height:int;
 		private var _copyBt:TButton;
-		private var _currentFormatedData : String;
-		private var _clearGridBt : TButton;
-		private var _textArea : ScrollPane;
-		private var _textfield : ScrollableTextField;
-		private var _holder : Sprite;
+		private var _currentFormatedData:String;
+		private var _clearGridBt:TButton;
+		private var _textArea:ScrollPane;
+		private var _textfield:ScrollableTextField;
+		private var _holder:Sprite;
+		private var _cbMinimizeParams:TCheckBox;
 		
 		
 		
@@ -58,6 +59,10 @@ package fr.durss.thermal {
 		/* ***************** *
 		 * GETTERS / SETTERS *
 		 * ***************** */
+		override public function set y(value:Number):void {
+			super.y = value;
+			computePositions();
+		}
 
 
 
@@ -102,6 +107,15 @@ package fr.durss.thermal {
 			
 			_currentFormatedData = result.join("\n");
 			
+			if(_cbMinimizeParams.selected && _cbFormatCodeCommands.selected) {
+				//Concatenate 4 consecutive commands into one
+				_currentFormatedData = _currentFormatedData.replace(/printer.writeBytes\(([^)]{1,4})\);\nprinter.writeBytes\(([^)]{1,4})\);\nprinter.writeBytes\(([^)]{1,4})\);\nprinter.writeBytes\(([^)]{1,4})\);/gmi, 'printer.writeBytes($1, $2, $3, $4);');
+				//Concatenate 3 consecutive commands into one
+				_currentFormatedData = _currentFormatedData.replace(/printer.writeBytes\(([^)]{1,4})\);\nprinter.writeBytes\(([^)]{1,4})\);\nprinter.writeBytes\(([^)]{1,4})\);/gmi, 'printer.writeBytes($1, $2, $3);');
+				//Concatenate 2 consecutive commands into one
+				_currentFormatedData = _currentFormatedData.replace(/printer.writeBytes\(([^)]{1,4})\);\nprinter.writeBytes\(([^)]{1,4})\);/gmi, 'printer.writeBytes($1, $2);');
+			}
+			
 			_textfield.text = _currentFormatedData;
 			_textArea.validate();
 			_copyBt.enabled = _currentFormatedData.length > 0;
@@ -122,6 +136,7 @@ package fr.durss.thermal {
 			_cbUserDefineCommands		= _holder.addChild(new TCheckBox(Label.getLabel("userDefineCmd"))) as TCheckBox;
 			_cbCharHeaderCmdCommands	= _holder.addChild(new TCheckBox(Label.getLabel("charHeaderCmd"))) as TCheckBox;
 			_cbFormatCodeCommands		= _holder.addChild(new TCheckBox(Label.getLabel("formatCode"))) as TCheckBox;
+			_cbMinimizeParams			= _holder.addChild(new TCheckBox(Label.getLabel("minimizeParams"))) as TCheckBox;
 			_inputCharIndex				= _holder.addChild(new TInput(Label.getLabel('charToreplace'))) as TInput;
 			_copyBt						= _holder.addChild(new TButton(Label.getLabel('copyData'))) as TButton;
 			_clearGridBt				= _holder.addChild(new TButton(Label.getLabel('clearGrid'))) as TButton;
@@ -133,6 +148,7 @@ package fr.durss.thermal {
 			_textArea.autoHideScrollers				= true;
 			_cbUserDefineCommands.selected			= 
 			_cbCharHeaderCmdCommands.selected		= 
+			_cbMinimizeParams.selected				= 
 			_cbFormatCodeCommands.selected			= true; 
 			_inputCharIndex.textfield.restrict		= '[0-9]';
 			_inputCharIndex.textfield.maxChars		= 3;
@@ -142,6 +158,7 @@ package fr.durss.thermal {
 			_cbUserDefineCommands.addEventListener(Event.CHANGE, updateFormHandler);
 			_cbCharHeaderCmdCommands.addEventListener(Event.CHANGE, updateFormHandler);
 			_cbFormatCodeCommands.addEventListener(Event.CHANGE, updateFormHandler);
+			_cbMinimizeParams.addEventListener(Event.CHANGE, updateFormHandler);
 			_inputCharIndex.addEventListener(Event.CHANGE, updateFormHandler);
 			_inputCharIndex.addEventListener(FocusEvent.FOCUS_OUT, focusOutInputHandler);
 			_copyBt.addEventListener(MouseEvent.CLICK, copyHandler);
@@ -203,14 +220,14 @@ package fr.durss.thermal {
 		private function computePositions(event:Event = null):void {
 			var margin:int = 10;
 			_holder.x = _holder.y = margin;
-			PosUtils.vPlaceNext(10, _hexaValues, _cbUserDefineCommands, _cbCharHeaderCmdCommands, _cbFormatCodeCommands, _inputCharIndex, _clearGridBt, _copyBt, _textArea);
+			PosUtils.vPlaceNext(10, _hexaValues, _cbUserDefineCommands, _cbCharHeaderCmdCommands, _cbFormatCodeCommands, _cbMinimizeParams, _inputCharIndex, _clearGridBt, _copyBt, _textArea);
 			_inputCharIndex.width = Math.max(_hexaValues.width, _cbUserDefineCommands.width, _cbCharHeaderCmdCommands.width, _cbFormatCodeCommands.width);
 			
 			PosUtils.hCenterIn(_clearGridBt, _inputCharIndex); 
 			PosUtils.hCenterIn(_copyBt, _inputCharIndex);
 			
 			_textArea.width = _inputCharIndex.width;
-			_textArea.height = stage.stageHeight - _textArea.y - margin * 2;
+			_textArea.height = stage.stageHeight - y - _textArea.y - margin * 2;
 			_textArea.validate();
 			
 			graphics.clear();
