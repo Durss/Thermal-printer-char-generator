@@ -36,9 +36,9 @@ package fr.durss.thermal {
 		private var _bitmap:Bitmap;
 		private var _limits:Shape;
 		private var _form:FormPanel;
-		private var _font : FontPanel;
-		private var _rightPressed : Boolean;
-		private var _dragOffset : Point;
+		private var _font:FontPanel;
+		private var _rightPressed:Boolean;
+		private var _dragOffset:Point;
 		
 		
 		
@@ -106,6 +106,7 @@ package fr.durss.thermal {
 				_grid.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, rightDownHandler);
 			}
 			addEventListener(Event.ENTER_FRAME, enterFrameHandler);
+			_form.addEventListener(Event.CHANGE, changeFormDataHandler);
 			_form.addEventListener(Event.CLEAR, clearGridHandler);
 			_font.addEventListener(FormComponentEvent.SUBMIT, generateFromFontHandler);
 			computePositions();
@@ -158,7 +159,7 @@ package fr.durss.thermal {
 		/**
 		 * Called when right button is pressed
 		 */
-		private function rightDownHandler(event : MouseEvent) : void {
+		private function rightDownHandler(event:MouseEvent):void {
 			_rightPressed = true;
 			_dragOffset.x = _grid.mouseX;
 			_dragOffset.y = _grid.mouseY;
@@ -218,7 +219,11 @@ package fr.durss.thermal {
 			
 			//search for first pixel
 			var rect:Rectangle = _bmd.getColorBoundsRect(0xffffffff, 0xFFFF0000, true);
-			rect.y = 0;
+			if(!_form.forceFullSize) {
+				rect.y = 0;
+			}else{
+				rect = _bmd.rect;
+			}
 			if (rect.width == 0 || rect.height == 0) {
 				//bug with getColorBoundsRect if top/left pixel is filled, it doesn't
 				//find it..
@@ -232,14 +237,15 @@ package fr.durss.thermal {
 			rect.height = 3 * 8;//Math.ceil(rect.height / 8) * 8;
 			rect.width = MathUtils.restrict(rect.width, 0, 12);
 			
-			
-			_limits.graphics.beginFill(0xffffff, .8);
-			_limits.graphics.drawRect(_bitmap.x, _bitmap.y, _grid.width, _grid.height);
-			_limits.graphics.lineStyle(2, 0x0000cc);
-			_limits.graphics.drawRect(	rect.x * _cellSize + _bitmap.x,
-										rect.y * _cellSize + _bitmap.y,
-										rect.width * _cellSize + 1,
-										rect.height * _cellSize + 1);
+			if(!_form.forceFullSize) {
+				_limits.graphics.beginFill(0xffffff, .8);
+				_limits.graphics.drawRect(_bitmap.x, _bitmap.y, _grid.width, _grid.height);
+				_limits.graphics.lineStyle(2, 0x0000cc);
+				_limits.graphics.drawRect(	rect.x * _cellSize + _bitmap.x,
+											rect.y * _cellSize + _bitmap.y,
+											rect.width * _cellSize + 1,
+											rect.height * _cellSize + 1);
+			}
 			
 			var ba:ByteArray = new ByteArray();
 			var i:int, len:int, px:int, py:int, byte:int, v:int;
@@ -271,6 +277,13 @@ package fr.durss.thermal {
 			pos.y = Math.round((_bmd.height - _font.bitmapData.height) * .5);
 			_bmd.copyPixels(_font.bitmapData, _font.bitmapData.rect, pos);
 			
+			generateBin();
+		}
+		
+		/**
+		 * Called when a form's input's value changes
+		 */
+		private function changeFormDataHandler(event:Event):void {
 			generateBin();
 		}
 		

@@ -39,8 +39,8 @@ package fr.durss.thermal {
 		private var _bmd:BitmapData;
 		private var _tf:TextField;
 		private var _comboStyle:TComboBox;
-		private var _intervalCompute : uint;
-		private var _height : Number;
+		private var _intervalCompute:uint;
+		private var _height:Number;
 		
 		
 		
@@ -215,7 +215,7 @@ package fr.durss.thermal {
 		/**
 		 * Sorts fonts on their names
 		 */
-		function sortOnNames(a:Font, b:Font):int {
+		private function sortOnNames(a:Font, b:Font):int {
 			if(a.fontName < b.fontName) return -1;
 			if(a.fontName > b.fontName) return 1;
 			return 0;

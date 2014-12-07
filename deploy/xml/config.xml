@@ -26,7 +26,8 @@
 		<label code="charHeaderCmd"><![CDATA[Add char's headers command]]></label>
 		<label code="formatCode"><![CDATA[Format code]]></label>
 		<label code="hexaValues"><![CDATA[Hexadecimal values]]></label>
-		<label code="charToreplace"><![CDATA[Char index to edit (32 < n < 127 )]]></label>
+		<label code="forceSize"><![CDATA[Force size 12x24]]></label>
+		<label code="charToreplace"><![CDATA[Char index to edit (31 < n < 127 )]]></label>
 		<label code="copyData"><![CDATA[Copy code]]></label>
 		<label code="clearGrid"><![CDATA[Clear grid]]></label>
 		<label code="minimizeParams"><![CDATA[Minimize parameters]]></label>

@@ -40,6 +40,7 @@ package fr.durss.thermal {
 		private var _textfield:ScrollableTextField;
 		private var _holder:Sprite;
 		private var _cbMinimizeParams:TCheckBox;
+		private var _cbForceSize:TCheckBox;
 		
 		
 		
@@ -62,6 +63,13 @@ package fr.durss.thermal {
 		override public function set y(value:Number):void {
 			super.y = value;
 			computePositions();
+		}
+		
+		/**
+		 * Gets if the full size has been forced
+		 */
+		public function get forceFullSize():Boolean {
+			return _cbForceSize.selected;
 		}
 
 
@@ -137,6 +145,7 @@ package fr.durss.thermal {
 			_cbCharHeaderCmdCommands	= _holder.addChild(new TCheckBox(Label.getLabel("charHeaderCmd"))) as TCheckBox;
 			_cbFormatCodeCommands		= _holder.addChild(new TCheckBox(Label.getLabel("formatCode"))) as TCheckBox;
 			_cbMinimizeParams			= _holder.addChild(new TCheckBox(Label.getLabel("minimizeParams"))) as TCheckBox;
+			_cbForceSize				= _holder.addChild(new TCheckBox(Label.getLabel("forceSize"))) as TCheckBox;
 			_inputCharIndex				= _holder.addChild(new TInput(Label.getLabel('charToreplace'))) as TInput;
 			_copyBt						= _holder.addChild(new TButton(Label.getLabel('copyData'))) as TButton;
 			_clearGridBt				= _holder.addChild(new TButton(Label.getLabel('clearGrid'))) as TButton;
@@ -149,6 +158,7 @@ package fr.durss.thermal {
 			_cbUserDefineCommands.selected			= 
 			_cbCharHeaderCmdCommands.selected		= 
 			_cbMinimizeParams.selected				= 
+			_cbForceSize.selected					= 
 			_cbFormatCodeCommands.selected			= true; 
 			_inputCharIndex.textfield.restrict		= '[0-9]';
 			_inputCharIndex.textfield.maxChars		= 3;
@@ -159,6 +169,7 @@ package fr.durss.thermal {
 			_cbCharHeaderCmdCommands.addEventListener(Event.CHANGE, updateFormHandler);
 			_cbFormatCodeCommands.addEventListener(Event.CHANGE, updateFormHandler);
 			_cbMinimizeParams.addEventListener(Event.CHANGE, updateFormHandler);
+			_cbForceSize.addEventListener(Event.CHANGE, updateFormHandler);
 			_inputCharIndex.addEventListener(Event.CHANGE, updateFormHandler);
 			_inputCharIndex.addEventListener(FocusEvent.FOCUS_OUT, focusOutInputHandler);
 			_copyBt.addEventListener(MouseEvent.CLICK, copyHandler);
@@ -186,9 +197,7 @@ package fr.durss.thermal {
 		 * Forces a refresh of the data
 		 */
 		private function updateFormHandler(event:Event):void {
-			if(_currentData != null) {
-				populate(_currentData, _width, _height);
-			}
+			dispatchEvent(new Event(Event.CHANGE));
 		}
 		
 		/**
@@ -199,7 +208,7 @@ package fr.durss.thermal {
 			
 			var char:int = parseInt(_inputCharIndex.text);
 			if(isNaN(char)) char = 33;
-			if(char < 33) char = 33;
+			if(char < 32) char = 33;
 			if(char > 126) char = 126;
 			_inputCharIndex.text = char.toString();
 			
@@ -220,7 +229,7 @@ package fr.durss.thermal {
 		private function computePositions(event:Event = null):void {
 			var margin:int = 10;
 			_holder.x = _holder.y = margin;
-			PosUtils.vPlaceNext(10, _hexaValues, _cbUserDefineCommands, _cbCharHeaderCmdCommands, _cbFormatCodeCommands, _cbMinimizeParams, _inputCharIndex, _clearGridBt, _copyBt, _textArea);
+			PosUtils.vPlaceNext(10, _hexaValues, _cbUserDefineCommands, _cbCharHeaderCmdCommands, _cbFormatCodeCommands, _cbMinimizeParams, _cbForceSize, _inputCharIndex, _clearGridBt, _copyBt, _textArea);
 			_inputCharIndex.width = Math.max(_hexaValues.width, _cbUserDefineCommands.width, _cbCharHeaderCmdCommands.width, _cbFormatCodeCommands.width);
 			
 			PosUtils.hCenterIn(_clearGridBt, _inputCharIndex); 
@@ -244,7 +253,10 @@ package fr.durss.thermal {
 			
 			x = stage.stageWidth - width + 4;
 		}
-
+		
+		/**
+		 * Formats a byte value
+		 */
 		private function formatByte(data:int):String {
 			var prefix:String = _hexaValues.selected? "0x" : "";
 			var base:int = _hexaValues.selected? 16 : 10;
