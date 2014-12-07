@@ -15,6 +15,11 @@ Regarding the Adafruit's lib, by default writeBytes() methods are private, think
 If you don't know how to do that, you can copy/paste the file from the repository into your local library.
 
 You should find it at this location :
+
 C:\Users\{YOUR USER NAME}\Documents\Arduino\libraries\Adafruit_Thermal
+
+
+You can find the tool here :
+https://dl.dropboxusercontent.com/u/20758492/arduino/thermalPrinterCharsGen/index.html
 
 Enjoy !
