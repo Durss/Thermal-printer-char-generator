@@ -22,20 +22,36 @@
 	</fonts>
 
 	<labels>
+		<label code="modeTitle"><![CDATA[Create : ]]></label>
+		<label code="toolsTitle"><![CDATA[Tools : ]]></label>
+		<label code="pencil"><![CDATA[Pencil]]></label>
+		<label code="calkText"><![CDATA[Text]]></label>
+		<label code="calkImage"><![CDATA[Image]]></label>
+		<label code="modeFont"><![CDATA[Font]]></label>
+		<label code="modeImage"><![CDATA[Image]]></label>
 		<label code="userDefineCmd"><![CDATA[Add "enable user-define chars" commands]]></label>
 		<label code="charHeaderCmd"><![CDATA[Add char's headers command]]></label>
 		<label code="formatCode"><![CDATA[Format code]]></label>
 		<label code="hexaValues"><![CDATA[Hexadecimal values]]></label>
 		<label code="forceSize"><![CDATA[Force size 12x24]]></label>
 		<label code="charToreplace"><![CDATA[Char index to edit (31 < n < 127 )]]></label>
+		<label code="className"><![CDATA[Bitmap's name...]]></label>
 		<label code="copyData"><![CDATA[Copy code]]></label>
 		<label code="clearGrid"><![CDATA[Clear grid]]></label>
 		<label code="minimizeParams"><![CDATA[Minimize parameters]]></label>
 		<label code="fontListTitle"><![CDATA[Font...]]></label>
-		<label code="generateChar"><![CDATA[Generate]]></label>
+		<label code="generateChar"><![CDATA[Draw]]></label>
 		<label code="fontSizeTitle"><![CDATA[Size...]]></label>
 		<label code="defaultChar"><![CDATA[char...]]></label>
 		<label code="fontTypeTitle"><![CDATA[Style...]]></label>
+		<label code="lineBreaks"><![CDATA[Insert line breaks]]></label>
+		<label code="includeZones"><![CDATA[Include zones]]></label>
+		<label code="browseLabel"><![CDATA[Select an image :]]></label>
+		<label code="browse"><![CDATA[Browse...]]></label>
+		<label code="browseInfos"><![CDATA[Images larger/higher than 600x1000 will be cropped.<br />Only pixels with 80% of brightness will be kept.]]></label>
+		<label code="zoneTool"><![CDATA[Zones]]></label>
+		<label code="zoneInfos"><![CDATA[Draw a rectangle area inside your image. Its coordinates will be set as constants in the generated code.<br />This will make easier to inject an other image later inside your Arduino program.<br /><br />Click an item's label to edit its name, click cross to delete it.]]></label>
+		<label code="zoneHelp"><![CDATA[<br /><br /><span class="highlight">- Draw a rectangle on the grid to add a new zone -</span>]]></label>
 	</labels>
 	
 	<dependencies>

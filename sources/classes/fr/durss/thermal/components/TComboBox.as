@@ -2,7 +2,6 @@ package fr.durss.thermal.components {
 	import fr.durss.thermal.graphics.ComboboxArrowIcon;
 
 	import com.nurun.components.button.IconAlign;
-	import com.nurun.components.button.TextAlign;
 	import com.nurun.components.form.ComboBox;
 	import com.nurun.components.form.events.ListEvent;
 
@@ -37,7 +36,6 @@ package fr.durss.thermal.components {
 			list.scrollableList.allowMultipleSelection = false;
 			list.scrollableList.group.allowNoSelection = false;
 			bt.iconAlign = IconAlign.RIGHT;
-			bt.textAlign = TextAlign.CENTER;
 		}
 
 		

@@ -35,10 +35,12 @@ package fr.durss.thermal.components {
 			fv.addTarget(defaultBackground as MovieClip, options);
 			fv.addTarget(selectedBackground as MovieClip, options);
 			
-			if(icon != null && icon is MovieClip) {
+			if(icon != null) {
 				iconAlign = IconAlign.LEFT;
 				iconSpacing = 10;
-				fv.addTarget(icon as MovieClip);
+				if(icon is MovieClip) {
+					fv.addTarget(icon as MovieClip, options);
+				}
 			}
 			accept(fv);
 			accept(new CssVisitor());

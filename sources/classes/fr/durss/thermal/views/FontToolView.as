@@ -1,10 +1,15 @@
-package fr.durss.thermal {
+package fr.durss.thermal.views {
 	import fr.durss.thermal.components.TButton;
 	import fr.durss.thermal.components.TComboBox;
 	import fr.durss.thermal.components.TInput;
+	import fr.durss.thermal.controler.FrontControler;
+	import fr.durss.thermal.model.Model;
+	import fr.durss.thermal.vo.Metrics;
+	import fr.durss.thermal.vo.Mode;
 
-	import com.nurun.components.form.events.FormComponentEvent;
 	import com.nurun.structure.environnement.label.Label;
+	import com.nurun.structure.mvc.model.events.IModelEvent;
+	import com.nurun.structure.mvc.views.AbstractView;
 	import com.nurun.utils.pos.PosUtils;
 	import com.nurun.utils.text.TextBounds;
 
@@ -17,6 +22,7 @@ package fr.durss.thermal {
 	import flash.text.Font;
 	import flash.text.FontType;
 	import flash.text.TextField;
+	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
 	import flash.utils.clearInterval;
 	import flash.utils.setInterval;
@@ -30,7 +36,7 @@ package fr.durss.thermal {
 	 * @author Durss
 	 * @date 6 déc. 2014;
 	 */
-	public class FontPanel extends Sprite {
+	public class FontToolView extends AbstractView {
 		private var _comboFont:TComboBox;
 		private var _holder:Sprite;
 		private var _input:TInput;
@@ -40,7 +46,7 @@ package fr.durss.thermal {
 		private var _tf:TextField;
 		private var _comboStyle:TComboBox;
 		private var _intervalCompute:uint;
-		private var _height:Number;
+		private var _width:Number;
 		
 		
 		
@@ -49,9 +55,9 @@ package fr.durss.thermal {
 		 * CONSTRUCTOR *
 		 * *********** */
 		/**
-		 * Creates an instance of <code>FontPanel</code>.
+		 * Creates an instance of <code>FontToolView</code>.
 		 */
-		public function FontPanel() {
+		public function FontToolView() {
 			initialize();
 		}
 
@@ -65,16 +71,26 @@ package fr.durss.thermal {
 		 */
 		public function get bitmapData():BitmapData{ return _bmd; }
 		
-		/**
-		 * Gets the currently selected font
-		 */
-		override public function get height():Number{ return _height; }
-
+		override public function set width(value:Number):void {
+			_width = value;
+			computePositions();
+		}
+		
 
 
 		/* ****** *
 		 * PUBLIC *
 		 * ****** */
+		/**
+		 * Called on model's update
+		 */
+		override public function update(event:IModelEvent):void {
+			var model:Model = event.model as Model;
+			_input.textfield.maxChars = model.currentMode == Mode.MODE_FONT_GLYPH? 1 : 100;
+			if(_input.text != _input.defaultLabel && _input.text.length > _input.textfield.maxChars ) {
+				_input.text = _input.text.substr(0, _input.textfield.maxChars);
+			}
+		}
 
 
 		
@@ -86,7 +102,8 @@ package fr.durss.thermal {
 		 * Initialize the class.
 		 */
 		private function initialize():void {
-			_tf			= new TextField();
+			_width		= 800;
+			_tf			= addChild(new TextField()) as TextField;//Need to add it to the stage !! Read bellow
 			_holder		= addChild(new Sprite()) as Sprite;
 			_comboFont	= _holder.addChild(new TComboBox(Label.getLabel('fontListTitle'))) as TComboBox;
 			_comboSize	= _holder.addChild(new TComboBox(Label.getLabel('fontSizeTitle'))) as TComboBox;
@@ -95,8 +112,14 @@ package fr.durss.thermal {
 			_submitBt	= _holder.addChild(new TButton(Label.getLabel('generateChar'))) as TButton;
 			
 			_input.text = "A";
-			_input.textfield.maxChars = 1;
+			_tf.autoSize = TextFieldAutoSize.LEFT;
 			_comboFont.listHeight = 300;
+			//If the textfield isn't added to the stage, the rendering
+			//of ALL the buttons is fucked up. Probably a bug due to
+			//textfield + textformat drawing to a BitmapData...dunno.
+			//What's sure is that if the textfield isn't on the stage
+			//everything exploses when buttons states are refreshed (on roll)
+			_tf.visible = false;
 			
 			//Build fonts list
 			var fonts:Array = Font.enumerateFonts(true);
@@ -113,7 +136,7 @@ package fr.durss.thermal {
 			setTimeout(stopComputePosition, len * 20);
 			
 			//Build sizes list
-			for(i = 6; i <= 20; ++i) {
+			for(i = 6; i <= 100; ++i) {
 				_comboSize.addSkinnedItem(i.toString(), i);
 			}
 			_comboSize.validate();
@@ -126,16 +149,6 @@ package fr.durss.thermal {
 			_comboSize.selectedIndex = 0;
 			
 			_submitBt.addEventListener(MouseEvent.CLICK, submitHandler);
-			
-			addEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);
-		}
-		
-		/**
-		 * Called when the stage is available.
-		 */
-		private function addedToStageHandler(event:Event):void {
-			removeEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);
-			stage.addEventListener(Event.RESIZE, computePositions);
 			computePositions();
 		}
 		
@@ -143,23 +156,25 @@ package fr.durss.thermal {
 		 * Resize and replace the elements.
 		 */
 		private function computePositions(event:Event = null):void {
-			var margin:int = 10;
-			_holder.x = _holder.y = margin;
-			_comboSize.width = 100;
-			_comboStyle.width = 200;
+			var margin:int		= 10;
+			_holder.x			= _holder.y = margin;
+			_comboSize.width	= 100;
+			_comboStyle.width	= 135;
 			
-			PosUtils.hPlaceNext(10, _comboFont, _comboStyle, _comboSize, _input, _submitBt);
+			var items:Array = [_comboFont, _comboStyle, _comboSize, _input, _submitBt];
+			PosUtils.hDistribute(items, _width, margin, margin);
 			_comboFont.height = _comboStyle.height = _comboSize.height = _input.height = _submitBt.height = _input.height;
-//			PosUtils.vAlign(PosUtils.V_ALIGN_CENTER, 0, _comboFont, _comboSize, _input, _submitBt);
 			
-			_height = _submitBt.height + margin * 2;
+			_holder.y = Math.round((Metrics.TOP_BAR_HEIGHT - _submitBt.height) * .5);
+			
+			var h:int = _submitBt.y + _submitBt.height + margin + _holder.y;
 			graphics.clear();
-			graphics.beginFill(0xffffff, 1);
-			graphics.drawRect(0, 0, stage.stageWidth, _submitBt.height + margin * 2);
+			graphics.beginFill(0xfcfcfc, 1);
+			graphics.drawRect(0, 0, _width, h);
 			graphics.beginFill(0, .2);
-			graphics.drawRect(0, _height, width, 2);
+			graphics.drawRect(0, h, width, 2);
 			graphics.beginFill(0, .1);
-			graphics.drawRect(0, _height + 2, width, 2);
+			graphics.drawRect(0, h + 2, width, 2);
 			graphics.endFill();
 		}
 		
@@ -172,15 +187,18 @@ package fr.durss.thermal {
 			if(font == null || _input.text.length == 0 || _input.text == _input.defaultLabel) return;
 
 			var format:TextFormat = new TextFormat();
-			format.font = font.fontName;
-			format.bold = _comboStyle.selectedData == 'bold' || _comboStyle.selectedData == 'bold italic';
-			format.italic = _comboStyle.selectedData == 'italic' || _comboStyle.selectedData == 'bold italic';
-			format.size = _comboSize.value;
+			format.font		= font.fontName;
+			format.bold		= _comboStyle.selectedData == 'bold' || _comboStyle.selectedData == 'bold italic';
+			format.italic	= _comboStyle.selectedData == 'italic' || _comboStyle.selectedData == 'bold italic';
+			format.size		= _comboSize.selectedData;
 			
-			_tf.defaultTextFormat = format;
 			_tf.text = _input.text;
+			_tf.setTextFormat(format);
 
+			_tf.visible = true;//TextBounds checks for textfield's visibility (which sounds stupid..)
 			var bounds:Rectangle = TextBounds.getBounds(_tf);
+			_tf.visible = false;//Read initialize() for more info
+			
 			var m:Matrix = new Matrix();
 			m.translate(-bounds.x, -bounds.y);
 			if(bounds.width == 0 || bounds.height == 0) return;
@@ -200,16 +218,7 @@ package fr.durss.thermal {
 				_bmd.setPixel32(px, py, color);
 			}
 			
-//			var scale:Number = 20;
-//			m = new Matrix();
-//			m.scale(scale, scale);
-//			m.translate(20, 100);
-//			graphics.clear();
-//			computePositions();
-//			graphics.beginBitmapFill(_bmd, m);
-//			graphics.drawRect(20, 100, _bmd.width * scale, _bmd.height * scale);
-			
-			dispatchEvent(new FormComponentEvent(FormComponentEvent.SUBMIT));
+			FrontControler.getInstance().generateFontBitmapData( _bmd );
 		}
 		
 		/**

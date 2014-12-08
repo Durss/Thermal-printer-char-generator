@@ -8,8 +8,10 @@
 .tooltip { font-family:HelveticaNeueCn; font-size:16px; color:#666666; }
 
 .button { font-family:HelveticaNeueBlk; font-size:18px; color:#00CCCC; flash-alpha:1; }
+.button_selected { font-family:HelveticaNeueBlk; font-size:18px; color:#009999; flash-alpha:1; }
 .button_disabled { font-family:HelveticaNeueBlk; font-size:18px; color:#00CCCC; flash-alpha:.4; }
 
+.comboboxItem { font-family:HelveticaNeueBlk; font-size:18px; color:#00CCCC; text-align:left; }
 .comboboxItem { font-family:HelveticaNeueMd; font-size:18px; color:#649EAC; }
 .comboboxItem_selected { font-family:HelveticaNeueMd; font-size:18px; color:#00CCCC; }
 
@@ -17,3 +19,8 @@
 .checkbox_selected { font-family:HelveticaNeue; font-size:16px; color:#666666; }
 
 .code { font-family:Courier; font-size:14px; color:#000000; }
+
+.title { font-family:HelveticaNeueBlk; font-size:20px; color:#000000; }
+.infos { font-family:HelveticaNeue; font-size:14px; color:#000000; }
+.zoneItem { font-family:HelveticaNeueMd; font-size:12px; color:#ffffff; }
+.highlight { font-family:HelveticaNeueMd; font-size:14px; color:#A1D4D0; }
