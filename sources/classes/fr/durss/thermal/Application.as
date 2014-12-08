@@ -1,4 +1,11 @@
 package fr.durss.thermal {
+	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
+	import flash.events.MouseEvent;
+	import flash.filters.DropShadowFilter;
+	import com.nurun.utils.pos.roundPos;
+	import fr.durss.thermal.graphics.GitIconGraphic;
+	import fr.durss.thermal.components.TButton;
 	import fr.durss.thermal.utils.initSerializableClasses;
 	import gs.plugins.TransformAroundCenterPlugin;
 	import gs.plugins.TweenPlugin;
@@ -27,7 +34,8 @@ package fr.durss.thermal {
 	[SWF(width="1280", height="600", backgroundColor="0xFFFFFF", frameRate="31")]
 	[Frame(factoryClass="fr.durss.thermal.ApplicationLoader")]
 	public class Application extends MovieClip {
-		private var _model:Model;
+		private var _model : Model;
+		private var _git : TButton;
 		
 		
 		
@@ -76,12 +84,19 @@ package fr.durss.thermal {
 			addChild(new ToolsView());
 			addChild(new OutputPanelView());
 			addChild(new ModeView());
+			_git = addChild(new TButton('View on Github', 'button', new GitIconGraphic())) as TButton;
+			_git.filters = [new DropShadowFilter(0,0,0,.3,5,5,1,2)]
 			
 //			_form.addEventListener(Event.CHANGE, changeFormDataHandler);
 //			_form.addEventListener(Event.CLEAR, clearGridHandler);
 //			_font.addEventListener(FormComponentEvent.SUBMIT, generateFromFontHandler);
 			
 			addEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);
+			_git.addEventListener(MouseEvent.CLICK, clickGitHandler);
+		}
+
+		private function clickGitHandler(event : MouseEvent) : void {
+			navigateToURL(new URLRequest('https://github.com/Durss/Thermal-printer-char-generator'), '_blank');
 		}
 		
 		/**
@@ -103,6 +118,9 @@ package fr.durss.thermal {
 			graphics.clear();
 			graphics.beginFill(0xF5F5F5, 1);
 			graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
+			
+			_git.y = stage.stageHeight - _git.height;
+			roundPos(_git);
 		}
 		
 	}
