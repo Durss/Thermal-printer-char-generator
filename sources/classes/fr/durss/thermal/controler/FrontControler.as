@@ -133,14 +133,14 @@ package fr.durss.thermal.controler {
 		/**
 		 * Loads a configuration file
 		 */
-		public function load() : void {
+		public function load():void {
 			_model.load();
 		}
 		
 		/**
 		 * Saves the current configurations to an external file
 		 */
-		public function save() : void {
+		public function save():void {
 			_model.save();
 		}
 

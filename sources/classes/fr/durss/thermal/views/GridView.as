@@ -109,7 +109,6 @@ package fr.durss.thermal.views {
 			
 			if(_bmd != null && model.currentData != null && model.currentData.bmd != null && model.currentData.bmd.bytesAvailable > 0) {
 				model.currentData.bmd.position = 0;
-				_bmd.fillRect(_bmd.rect, 0);
 				_bmd.setPixels(_bmd.rect, model.currentData.bmd);
 			}
 		}
@@ -180,7 +179,7 @@ package fr.durss.thermal.views {
 			_grid.graphics.clear();
 			_grid.graphics.beginBitmapFill(_pattern);
 			_grid.graphics.drawRect(0, 0, _gridWidth * _cellSize + 1, _gridHeight*_cellSize + 1);
-			_bmd = new BitmapData(Math.floor(_grid.width / _cellSize), Math.floor(_grid.height/ _cellSize), true, 0);
+			_bmd = new BitmapData(_gridWidth, _gridHeight, true, 0);
 			if(_bitmap.bitmapData != null) {
 				_bmd.draw(_bitmap.bitmapData);
 				_bitmap.bitmapData.dispose();

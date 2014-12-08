@@ -168,7 +168,7 @@ package fr.durss.thermal.views {
 		 * Called when loading a configuration file.
 		 * Clear all the zones !
 		 */
-		private function loadConfHandler(event : ViewEvent) : void {
+		private function loadConfHandler(event:ViewEvent):void {
 			var i:int, len:int;
 			len = _zones.length;
 			for(i = 0; i < len; ++i) {

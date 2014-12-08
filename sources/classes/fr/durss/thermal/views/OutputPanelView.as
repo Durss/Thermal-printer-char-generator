@@ -55,10 +55,10 @@ package fr.durss.thermal.views {
 		private var _bitmapMode:Boolean;
 		private var _cbLineBreak:TCheckBox;
 		private var _zoneList:Vector.<ZoneData>;
-		private var _cbIncludeZones : TCheckBox;
-		private var _saveBt : TButton;
-		private var _loadBt : TButton;
-		private var _splitter : Shape;
+		private var _cbIncludeZones:TCheckBox;
+		private var _saveBt:TButton;
+		private var _loadBt:TButton;
+		private var _splitter:Shape;
 		
 		
 		
@@ -373,7 +373,7 @@ package fr.durss.thermal.views {
 		/**
 		 * Called when save or load button is clicked
 		 */
-		private function saveLoadHandler(event : MouseEvent) : void {
+		private function saveLoadHandler(event:MouseEvent):void {
 			if(event.currentTarget == _saveBt) {
 				FrontControler.getInstance().save();
 			}else if(event.currentTarget == _loadBt){

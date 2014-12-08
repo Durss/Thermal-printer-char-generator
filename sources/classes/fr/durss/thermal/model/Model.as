@@ -26,8 +26,8 @@ package fr.durss.thermal.model {
 	 */
 	public class Model extends EventDispatcher implements IModel {
 		private var _currentMode:String;
-		private var _zones : Vector.<ZoneData>;
-		private var _currentData : GridData;
+		private var _zones:Vector.<ZoneData>;
+		private var _currentData:GridData;
 		
 		
 		
@@ -55,7 +55,7 @@ package fr.durss.thermal.model {
 		/**
 		 * Gets the current grid's data
 		 */
-		public function get currentData() : GridData { return _currentData; }
+		public function get currentData():GridData { return _currentData; }
 
 
 
@@ -166,8 +166,8 @@ package fr.durss.thermal.model {
 		/**
 		 * Loads a configuration file
 		 */
-		public function load() : void {
-			var cmd : BrowseForFileCmd = new BrowseForFileCmd('Thermal file', '*.thrm');
+		public function load():void {
+			var cmd:BrowseForFileCmd = new BrowseForFileCmd('Thermal file', '*.thrm');
 			cmd.addEventListener(CommandEvent.COMPLETE, loadConfFileCompleteHandler);
 			cmd.execute();
 		}
@@ -175,7 +175,7 @@ package fr.durss.thermal.model {
 		/**
 		 * Saves the current configurations to an external file
 		 */
-		public function save() : void {
+		public function save():void {
 			var file:ByteArray = new ByteArray();
 			file.writeUnsignedInt(FileVersion.VERSION);
 			file.writeUTF(_currentMode);
@@ -232,9 +232,9 @@ package fr.durss.thermal.model {
 		/**
 		 * Called when configuration file loading completes
 		 */
-		private function loadConfFileCompleteHandler(event : CommandEvent) : void {
+		private function loadConfFileCompleteHandler(event:CommandEvent):void {
 			ViewLocator.getInstance().dispatchEvent(new ViewEvent(ViewEvent.LOAD_CONF));
-			var ba : ByteArray = event.data as ByteArray;
+			var ba:ByteArray = event.data as ByteArray;
 			switch(ba.readUnsignedInt()){
 				case 1:
 					_currentMode	= ba.readUTF();

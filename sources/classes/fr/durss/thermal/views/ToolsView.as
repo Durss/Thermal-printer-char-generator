@@ -41,8 +41,8 @@ package fr.durss.thermal.views {
 		private var _image:ImageToolView;
 		private var _zoneBt:TToggleButton;
 		private var _zone:ByteZoneToolView;
-		private var _pencilBt : TToggleButton;
-		private var _clearBt : TButton;
+		private var _pencilBt:TToggleButton;
+		private var _clearBt:TButton;
 		
 		
 		
@@ -197,7 +197,7 @@ package fr.durss.thermal.views {
 		/**
 		 * Called when clear button is clicked.
 		 */
-		private function clearHandler(event : MouseEvent) : void {
+		private function clearHandler(event:MouseEvent):void {
 			FrontControler.getInstance().clearGrid();
 		}
 		
