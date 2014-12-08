@@ -18,6 +18,7 @@ package fr.durss.thermal.events {
 		public static const ZONE_LIST_UPDATE:String = 'zoneListUpdate';
 		public static const ZONE_HIGHLIGHT:String = 'zoneHighlight';
 		public static const ZONE_LOWLIGHT:String = 'zoneLowlight';
+		public static const LOAD_CONF:String = 'loadConf';
 		private var _data:*;
 		
 		

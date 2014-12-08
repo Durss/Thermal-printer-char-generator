@@ -87,6 +87,7 @@ package fr.durss.thermal.views {
 			
 			_infos.text = Label.getLabel('zoneInfos') + Label.getLabel('zoneHelp');
 			
+			ViewLocator.getInstance().addEventListener(ViewEvent.LOAD_CONF, loadConfHandler);
 			ViewLocator.getInstance().addEventListener(ViewEvent.NEW_ZONE, newZoneHandler);
 			_btHolder.addEventListener(Event.CHANGE, computePositions);
 			_btHolder.addEventListener(MouseEvent.CLICK, clickItemHandler);
@@ -160,6 +161,20 @@ package fr.durss.thermal.views {
 				}
 				
 				computePositions();
+			}
+		}
+		
+		/**
+		 * Called when loading a configuration file.
+		 * Clear all the zones !
+		 */
+		private function loadConfHandler(event : ViewEvent) : void {
+			var i:int, len:int;
+			len = _zones.length;
+			for(i = 0; i < len; ++i) {
+				_zones[0].dispose();
+				_btHolder.removeChild(_zones[0]);
+				_zones.splice(0, 1);
 			}
 		}
 		

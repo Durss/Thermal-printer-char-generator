@@ -1,4 +1,5 @@
 package fr.durss.thermal.components {
+	import com.nurun.components.button.TextAlign;
 	import fr.durss.thermal.graphics.ButtonGraphic;
 	import fr.durss.thermal.graphics.LoaderSpinningSmallGraphic;
 
@@ -35,10 +36,11 @@ package fr.durss.thermal.components {
 			var options:FrameVisitorOptions = new FrameVisitorOptions("out", "over", "down", "disabled", true, .25);
 			options.pressFrameFrom = "down";
 			if(back) fv.addTarget(background as MovieClip, options);
-			if(icon != null && icon is MovieClip) {
+			if(icon != null) {
 				iconAlign = IconAlign.LEFT;
+				textAlign = TextAlign.RIGHT;
 				iconSpacing = 10;
-				fv.addTarget(icon as MovieClip);
+				if(icon is MovieClip) fv.addTarget(icon as MovieClip, options);
 			}
 			accept(fv);
 			accept(new CssVisitor());

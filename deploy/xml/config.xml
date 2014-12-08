@@ -22,7 +22,9 @@
 	</fonts>
 
 	<labels>
-		<label code="modeTitle"><![CDATA[Create : ]]></label>
+		<label code="modeTitle"><![CDATA[Mode : ]]></label>
+		<label code="saveConf"><![CDATA[Save]]></label>
+		<label code="loadConf"><![CDATA[Load]]></label>
 		<label code="toolsTitle"><![CDATA[Tools : ]]></label>
 		<label code="pencil"><![CDATA[Pencil]]></label>
 		<label code="calkText"><![CDATA[Text]]></label>
@@ -37,7 +39,7 @@
 		<label code="charToreplace"><![CDATA[Char index to edit (31 < n < 127 )]]></label>
 		<label code="className"><![CDATA[Bitmap's name...]]></label>
 		<label code="copyData"><![CDATA[Copy code]]></label>
-		<label code="clearGrid"><![CDATA[Clear grid]]></label>
+		<label code="clearGrid"><![CDATA[Clear]]></label>
 		<label code="minimizeParams"><![CDATA[Minimize parameters]]></label>
 		<label code="fontListTitle"><![CDATA[Font...]]></label>
 		<label code="generateChar"><![CDATA[Draw]]></label>

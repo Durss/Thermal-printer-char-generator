@@ -1,4 +1,8 @@
 package fr.durss.thermal.views {
+	import fr.durss.thermal.graphics.LoadIconGraphic;
+	import fr.durss.thermal.graphics.SaveIconGraphic;
+	import com.nurun.utils.draw.createRect;
+	import flash.display.Shape;
 	import fr.durss.thermal.components.TButton;
 	import fr.durss.thermal.components.TCheckBox;
 	import fr.durss.thermal.components.TInput;
@@ -43,7 +47,6 @@ package fr.durss.thermal.views {
 		private var _input:TInput;
 		private var _copyBt:TButton;
 		private var _currentFormatedData:String;
-		private var _clearGridBt:TButton;
 		private var _textArea:ScrollPane;
 		private var _textfield:ScrollableTextField;
 		private var _holder:Sprite;
@@ -52,7 +55,10 @@ package fr.durss.thermal.views {
 		private var _bitmapMode:Boolean;
 		private var _cbLineBreak:TCheckBox;
 		private var _zoneList:Vector.<ZoneData>;
-		private var _cbIncludeZones:TCheckBox;
+		private var _cbIncludeZones : TCheckBox;
+		private var _saveBt : TButton;
+		private var _loadBt : TButton;
+		private var _splitter : Shape;
 		
 		
 		
@@ -115,6 +121,9 @@ package fr.durss.thermal.views {
 		 */
 		private function initialize():void {
 			_holder						= addChild(new Sprite()) as Sprite;
+			_saveBt						= _holder.addChild(new TButton(Label.getLabel('saveConf'), 'button', new SaveIconGraphic())) as TButton;
+			_loadBt						= _holder.addChild(new TButton(Label.getLabel('loadConf'), 'button', new LoadIconGraphic())) as TButton;
+			_splitter					= _holder.addChild(createRect(0xff00cccc, 100,1)) as Shape;
 			_hexaValues					= _holder.addChild(new TCheckBox(Label.getLabel("hexaValues"))) as TCheckBox;
 			_cbUserDefineCommands		= _holder.addChild(new TCheckBox(Label.getLabel("userDefineCmd"))) as TCheckBox;
 			_cbCharHeaderCmdCommands	= _holder.addChild(new TCheckBox(Label.getLabel("charHeaderCmd"))) as TCheckBox;
@@ -125,7 +134,6 @@ package fr.durss.thermal.views {
 			_cbIncludeZones				= _holder.addChild(new TCheckBox(Label.getLabel("includeZones"))) as TCheckBox;
 			_input						= _holder.addChild(new TInput(Label.getLabel('charToreplace'))) as TInput;
 			_copyBt						= _holder.addChild(new TButton(Label.getLabel('copyData'))) as TButton;
-			_clearGridBt				= _holder.addChild(new TButton(Label.getLabel('clearGrid'))) as TButton;
 			_textfield					= new ScrollableTextField('', 'code');
 			_textArea					= _holder.addChild(new ScrollPane(_textfield, new TScrollbar())) as ScrollPane;
 			
@@ -137,7 +145,7 @@ package fr.durss.thermal.views {
 			_cbMinimizeParams.selected				= 
 			_cbForceSize.selected					= 
 			_cbLineBreak.selected					= 
-			_cbIncludeZones.selected					= 
+			_cbIncludeZones.selected				= 
 			_cbFormatCodeCommands.selected			= true; 
 			
 			addEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);
@@ -152,19 +160,10 @@ package fr.durss.thermal.views {
 			_input.addEventListener(Event.CHANGE, updateFormHandler);
 			_input.addEventListener(FocusEvent.FOCUS_OUT, focusOutInputHandler);
 			_copyBt.addEventListener(MouseEvent.CLICK, copyHandler);
-			_clearGridBt.addEventListener(MouseEvent.CLICK, clearGridHandler);
+			_saveBt.addEventListener(MouseEvent.CLICK, saveLoadHandler);
+			_loadBt.addEventListener(MouseEvent.CLICK, saveLoadHandler);
 			ViewLocator.getInstance().addEventListener(ViewEvent.GRID_DATA_UPDATE, gridDataUpdateHandler);
 			ViewLocator.getInstance().addEventListener(ViewEvent.ZONE_LIST_UPDATE, zoneListUpdateHandler);
-		}
-		
-		/**
-		 * Called when clear button is clicked to clear the grid
-		 */
-		private function clearGridHandler(event:MouseEvent):void {
-			_copyBt.enabled = false;
-			_textfield.text = "";
-			_textArea.validate();
-			FrontControler.getInstance().clearGrid();
 		}
 		
 		/**
@@ -216,7 +215,7 @@ package fr.durss.thermal.views {
 			
 			var margin:int = 10;
 			_holder.x = _holder.y = margin;
-			var items:Array = [_hexaValues, _cbUserDefineCommands, _cbCharHeaderCmdCommands, _cbFormatCodeCommands, _cbMinimizeParams, _cbForceSize, _cbLineBreak, _cbIncludeZones, _input, _clearGridBt, _copyBt, _textArea];
+			var items:Array = [_saveBt, _splitter, _hexaValues, _cbUserDefineCommands, _cbCharHeaderCmdCommands, _cbFormatCodeCommands, _cbMinimizeParams, _cbForceSize, _cbLineBreak, _cbIncludeZones, _input, _copyBt, _textArea];
 			var i:int, len:int;
 			len = items.length;
 			for(i = 0; i < len; ++i) {
@@ -229,11 +228,13 @@ package fr.durss.thermal.views {
 			PosUtils.vPlaceNext(10, items);
 			_input.width = Math.max(_hexaValues.width, _cbUserDefineCommands.width, _cbCharHeaderCmdCommands.width, _cbFormatCodeCommands.width, _cbLineBreak.width, _cbIncludeZones.width);
 			
-			PosUtils.hCenterIn(_clearGridBt, _input); 
 			PosUtils.hCenterIn(_copyBt, _input);
 			
-			_textArea.width = _input.width;
-			_textArea.height = stage.stageHeight - y - _textArea.y - margin * 2;
+			_loadBt.y			= _saveBt.y;
+			_saveBt.x			= Math.round(_loadBt.width + margin);
+			_splitter.width		= _input.width;
+			_textArea.width		= _input.width;
+			_textArea.height	= stage.stageHeight - y - _textArea.y - margin * 2;
 			_textArea.validate();
 			
 			graphics.clear();
@@ -296,14 +297,15 @@ package fr.durss.thermal.views {
 					//Add zones infos
 					if(_cbIncludeZones.selected && _zoneList != null && _zoneList.length > 0) {
 						formated	+= '//Define zone bounds\n';
-						var i:int, len:int, zone:ZoneData;
+						var i:int, len:int, zone:ZoneData, zName:String;
 						len = _zoneList.length;
 						for(i = 0; i < len; ++i) {
-							zone = _zoneList[i];
-							formated	+= '#define ' + zone.name + '_x '+(zone.area.x - _currentData.areaSource.x)+'\n';
-							formated	+= '#define ' + zone.name + '_y '+(zone.area.y - _currentData.areaSource.y)+'\n';
-							formated	+= '#define ' + zone.name + '_width '+(zone.area.width)+'\n';
-							formated	+= '#define ' + zone.name + '_height '+(zone.area.height)+'\n\n';
+							zone		= _zoneList[i];
+							zName		= zone.name.split(/\n|\r/)[0];//Keep only first line of the name
+							formated	+= '#define ' + zName + '_x '+(zone.area.x - _currentData.areaSource.x)+'\n';
+							formated	+= '#define ' + zName + '_y '+(zone.area.y - _currentData.areaSource.y)+'\n';
+							formated	+= '#define ' + zName + '_width '+(zone.area.width)+'\n';
+							formated	+= '#define ' + zName + '_height '+(zone.area.height)+'\n\n';
 						}
 					}
 					formated			+= 'static const PROGMEM uint8_t ' + name + '_data[] = {';
@@ -366,6 +368,17 @@ package fr.durss.thermal.views {
 		private function zoneListUpdateHandler(event:ViewEvent):void {
 			_zoneList = event.data as Vector.<ZoneData>;
 			gridDataUpdateHandler();
+		}
+		
+		/**
+		 * Called when save or load button is clicked
+		 */
+		private function saveLoadHandler(event : MouseEvent) : void {
+			if(event.currentTarget == _saveBt) {
+				FrontControler.getInstance().save();
+			}else if(event.currentTarget == _loadBt){
+				FrontControler.getInstance().load();
+			}
 		}
 		
 	}

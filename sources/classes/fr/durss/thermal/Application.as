@@ -1,4 +1,5 @@
 package fr.durss.thermal {
+	import fr.durss.thermal.utils.initSerializableClasses;
 	import gs.plugins.TransformAroundCenterPlugin;
 	import gs.plugins.TweenPlugin;
 	import fr.durss.thermal.controler.FrontControler;
@@ -63,6 +64,8 @@ package fr.durss.thermal {
 		 * Initialize the class.
 		 */
 		private function initialize():void {
+			initSerializableClasses();
+			
 			TweenPlugin.activate([TransformAroundCenterPlugin]);
 			
 			_model = new Model();

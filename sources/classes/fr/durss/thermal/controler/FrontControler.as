@@ -1,11 +1,11 @@
 package fr.durss.thermal.controler {
-	import fr.durss.thermal.vo.ZoneData;
-	import flash.geom.Rectangle;
-	import flash.utils.ByteArray;
 	import fr.durss.thermal.model.Model;
+	import fr.durss.thermal.vo.ZoneData;
 
 	import flash.display.BitmapData;
 	import flash.errors.IllegalOperationError;
+	import flash.geom.Rectangle;
+	import flash.utils.ByteArray;
 	
 	
 	/**
@@ -91,8 +91,8 @@ package fr.durss.thermal.controler {
 		/**
 		 * Sets the current grid's data
 		 */
-		public function setCurrentData(data:ByteArray, areaSource:Rectangle):void {
-			_model.setCurrentData(data, areaSource);
+		public function setCurrentData(data:ByteArray, areaSource:Rectangle, bmd:BitmapData):void {
+			_model.setCurrentData(data, areaSource, bmd);
 		}
 		
 		/**
@@ -128,6 +128,20 @@ package fr.durss.thermal.controler {
 		 */
 		public function refreshZones():void {
 			_model.refreshZones();
+		}
+		
+		/**
+		 * Loads a configuration file
+		 */
+		public function load() : void {
+			_model.load();
+		}
+		
+		/**
+		 * Saves the current configurations to an external file
+		 */
+		public function save() : void {
+			_model.save();
 		}
 
 

@@ -1,5 +1,4 @@
 package fr.durss.thermal.views {
-	import gs.TweenLite;
 	import fr.durss.thermal.components.CopyOverlay;
 	import fr.durss.thermal.controler.FrontControler;
 	import fr.durss.thermal.events.ViewEvent;
@@ -8,6 +7,8 @@ package fr.durss.thermal.views {
 	import fr.durss.thermal.vo.Mode;
 	import fr.durss.thermal.vo.Tool;
 	import fr.durss.thermal.vo.ZoneData;
+
+	import gs.TweenLite;
 
 	import com.nurun.structure.mvc.model.events.IModelEvent;
 	import com.nurun.structure.mvc.views.AbstractView;
@@ -104,8 +105,13 @@ package fr.durss.thermal.views {
 			_cellSize		= _bitmapMode? 10 : 20;
 			
 			renderPatterns();
-			
 			computePositions(event as Event);
+			
+			if(_bmd != null && model.currentData != null && model.currentData.bmd != null && model.currentData.bmd.bytesAvailable > 0) {
+				model.currentData.bmd.position = 0;
+				_bmd.fillRect(_bmd.rect, 0);
+				_bmd.setPixels(_bmd.rect, model.currentData.bmd);
+			}
 		}
 
 
@@ -373,7 +379,7 @@ package fr.durss.thermal.views {
 				//bug with getColorBoundsRect if top/left pixel is filled, it doesn't
 				//find it..
 				if(_bmd.getPixel32(0, 0) !== 0xffff0000) {
-					FrontControler.getInstance().setCurrentData(new ByteArray(), rect);
+					FrontControler.getInstance().setCurrentData(new ByteArray(), rect, _bmd);
 					return;
 				}
 				else rect.width = rect.height = 1;
@@ -438,7 +444,7 @@ package fr.durss.thermal.views {
 				ba.writeByte(byte);
 			}
 			
-			FrontControler.getInstance().setCurrentData(ba, rect);
+			FrontControler.getInstance().setCurrentData(ba, rect, _bmd);
 		}
 		
 		/**

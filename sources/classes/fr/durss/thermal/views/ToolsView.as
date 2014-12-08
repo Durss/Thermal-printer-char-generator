@@ -1,4 +1,7 @@
 package fr.durss.thermal.views {
+	import fr.durss.thermal.graphics.ClearIconGraphic;
+	import flash.events.MouseEvent;
+	import fr.durss.thermal.components.TButton;
 	import fr.durss.thermal.graphics.DrawIconGraphic;
 	import fr.durss.thermal.vo.Tool;
 	import fr.durss.thermal.components.TToggleButton;
@@ -23,6 +26,7 @@ package fr.durss.thermal.views {
 	import flash.events.Event;
 
 	/**
+	 * Displays the toolsselector and sub menus
 	 * 
 	 * @author Durss
 	 * @date 8 déc. 2014;
@@ -37,7 +41,8 @@ package fr.durss.thermal.views {
 		private var _image:ImageToolView;
 		private var _zoneBt:TToggleButton;
 		private var _zone:ByteZoneToolView;
-		private var _pencilBt:TToggleButton;
+		private var _pencilBt : TToggleButton;
+		private var _clearBt : TButton;
 		
 		
 		
@@ -90,6 +95,7 @@ package fr.durss.thermal.views {
 			_textBt			= addChild(new TToggleButton(Label.getLabel('calkText'), 'button', new TextIconGraphic())) as TToggleButton;
 			_imageBt		= addChild(new TToggleButton(Label.getLabel('calkImage'), 'button', new ImageIconGraphic())) as TToggleButton;
 			_zoneBt			= addChild(new TToggleButton(Label.getLabel('zoneTool'), 'button', new AreaIconGraphic())) as TToggleButton;
+			_clearBt		= addChild(new TButton(Label.getLabel('clearGrid'), 'button', new ClearIconGraphic())) as TButton;
 			_group			= new FormComponentGroup();
 			
 			_label.text						= Label.getLabel('toolsTitle');
@@ -97,6 +103,7 @@ package fr.durss.thermal.views {
 			_textBt.textAlign				= TextAlign.RIGHT;
 			_imageBt.textAlign				= TextAlign.RIGHT;
 			_zoneBt.textAlign				= TextAlign.RIGHT;
+			_clearBt.textAlign				= TextAlign.RIGHT;
 			_group.allowMultipleSelection	= false;
 			_group.allowNoSelection			= false;
 			_group.addItem(_pencilBt);
@@ -105,6 +112,7 @@ package fr.durss.thermal.views {
 			_group.addItem(_zoneBt);
 			
 			addEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);
+			_clearBt.addEventListener(MouseEvent.CLICK, clearHandler);
 			_group.addEventListener(FormComponentGroupEvent.CHANGE, changeSelectionHandler);
 		}
 		
@@ -130,8 +138,8 @@ package fr.durss.thermal.views {
 		private function computePositions(event:Event = null):void {
 			var offset:int = (Metrics.TOP_BAR_HEIGHT - _imageBt.height) * .5;
 			_label.x = offset;
-			PosUtils.hPlaceNext(10, _label, _pencilBt, _textBt, _imageBt, _zoneBt);
-			PosUtils.vAlign(PosUtils.V_ALIGN_CENTER, offset, _label, _pencilBt, _imageBt, _textBt, _zoneBt);
+			PosUtils.hPlaceNext(10, _label, _pencilBt, _textBt, _imageBt, _zoneBt, _clearBt);
+			PosUtils.vAlign(PosUtils.V_ALIGN_CENTER, offset, _label, _pencilBt, _imageBt, _textBt, _zoneBt, _clearBt);
 			
 			var form:OutputPanelView = ViewLocator.getInstance().locateViewByType(OutputPanelView) as OutputPanelView;
 			_font.width = _image.width = _zone.width = stage.stageWidth - form.width + 4;
@@ -184,6 +192,13 @@ package fr.durss.thermal.views {
 				TweenLite.to(_zone, .25, {y: Metrics.TOP_BAR_HEIGHT});
 				FrontControler.getInstance().setCurrentTool(Tool.ZONE);
 			}
+		}
+		
+		/**
+		 * Called when clear button is clicked.
+		 */
+		private function clearHandler(event : MouseEvent) : void {
+			FrontControler.getInstance().clearGrid();
 		}
 		
 	}

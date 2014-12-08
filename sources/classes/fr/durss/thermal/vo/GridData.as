@@ -8,6 +8,7 @@ package fr.durss.thermal.vo {
 		
 		public var data:ByteArray;
 		public var areaSource:Rectangle;
+		public var bmd:ByteArray;
 		
 		public function GridData(){}
 		

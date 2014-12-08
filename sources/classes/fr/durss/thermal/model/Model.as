@@ -1,8 +1,9 @@
 package fr.durss.thermal.model {
-	import fr.durss.thermal.vo.ZoneData;
 	import fr.durss.thermal.events.ViewEvent;
+	import fr.durss.thermal.vo.FileVersion;
 	import fr.durss.thermal.vo.GridData;
 	import fr.durss.thermal.vo.Mode;
+	import fr.durss.thermal.vo.ZoneData;
 
 	import com.nurun.core.commands.events.CommandEvent;
 	import com.nurun.structure.mvc.model.IModel;
@@ -14,6 +15,7 @@ package fr.durss.thermal.model {
 	import flash.display.BitmapData;
 	import flash.events.EventDispatcher;
 	import flash.geom.Rectangle;
+	import flash.net.FileReference;
 	import flash.utils.ByteArray;
 	
 	/**
@@ -24,7 +26,8 @@ package fr.durss.thermal.model {
 	 */
 	public class Model extends EventDispatcher implements IModel {
 		private var _currentMode:String;
-		private var _zones:Vector.<ZoneData>;
+		private var _zones : Vector.<ZoneData>;
+		private var _currentData : GridData;
 		
 		
 		
@@ -48,6 +51,11 @@ package fr.durss.thermal.model {
 		 * Gets the current mode
 		 */
 		public function get currentMode():String { return _currentMode; }
+		
+		/**
+		 * Gets the current grid's data
+		 */
+		public function get currentData() : GridData { return _currentData; }
 
 
 
@@ -95,10 +103,12 @@ package fr.durss.thermal.model {
 		/**
 		 * Sets the current grid's data
 		 */
-		public function setCurrentData(data:ByteArray, areaSource:Rectangle):void {
+		public function setCurrentData(data:ByteArray, areaSource:Rectangle, bmd:BitmapData):void {
 			var d:GridData = new GridData();
+			d.bmd = bmd.getPixels(bmd.rect);
 			d.data = data;
 			d.areaSource = areaSource;
+			_currentData = d;
 			
 			ViewLocator.getInstance().dispatchEvent(new ViewEvent(ViewEvent.GRID_DATA_UPDATE, d));
 		}
@@ -152,6 +162,28 @@ package fr.durss.thermal.model {
 		public function refreshZones():void {
 			ViewLocator.getInstance().dispatchEvent(new ViewEvent(ViewEvent.ZONE_LIST_UPDATE, _zones));
 		}
+		
+		/**
+		 * Loads a configuration file
+		 */
+		public function load() : void {
+			var cmd : BrowseForFileCmd = new BrowseForFileCmd('Thermal file', '*.thrm');
+			cmd.addEventListener(CommandEvent.COMPLETE, loadConfFileCompleteHandler);
+			cmd.execute();
+		}
+		
+		/**
+		 * Saves the current configurations to an external file
+		 */
+		public function save() : void {
+			var file:ByteArray = new ByteArray();
+			file.writeUnsignedInt(FileVersion.VERSION);
+			file.writeUTF(_currentMode);
+			file.writeObject(_currentData);
+			file.writeObject(_zones);
+			
+			new FileReference().save(file, 'export_configuration.thrm');
+		}
 
 
 		
@@ -195,6 +227,30 @@ package fr.durss.thermal.model {
 				}
 			}
 			ViewLocator.getInstance().dispatchEvent(new ViewEvent(ViewEvent.GENERATE_FROM_BMD, bmd));
+		}
+		
+		/**
+		 * Called when configuration file loading completes
+		 */
+		private function loadConfFileCompleteHandler(event : CommandEvent) : void {
+			ViewLocator.getInstance().dispatchEvent(new ViewEvent(ViewEvent.LOAD_CONF));
+			var ba : ByteArray = event.data as ByteArray;
+			switch(ba.readUnsignedInt()){
+				case 1:
+					_currentMode	= ba.readUTF();
+					_currentData	= ba.readObject();
+					_zones			= ba.readObject();
+					var i:int, len:int;
+					len = _zones.length;
+					for(i = 0; i < len; ++i) {
+						ViewLocator.getInstance().dispatchEvent(new ViewEvent(ViewEvent.NEW_ZONE, _zones[i]));
+					}
+					ViewLocator.getInstance().dispatchEvent(new ViewEvent(ViewEvent.ZONE_LIST_UPDATE, _zones));
+					ViewLocator.getInstance().dispatchEvent(new ViewEvent(ViewEvent.GRID_DATA_UPDATE));
+					update();
+					break;
+				default:
+			}
 		}
 		
 	}

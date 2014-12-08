@@ -64,6 +64,15 @@ package fr.durss.thermal.components {
 		/* ****** *
 		 * PUBLIC *
 		 * ****** */
+		/**
+		 * Makes the component garbage collectable.
+		 */
+		override public function dispose():void {
+			textfield.removeEventListener(Event.CHANGE, changeLabelHandler);
+			textfield.removeEventListener(FocusEvent.FOCUS_OUT, focusOutTextfieldHandler);
+			_data = null;
+			super.dispose();
+		}
 
 
 		
@@ -79,6 +88,7 @@ package fr.durss.thermal.components {
 			textfield.border= true;
 			textfield.borderColor = 0xffffff;
 			stage.focus = textfield;
+			textfield.setSelection(0, textfield.length);
 			validate();
 		}
 

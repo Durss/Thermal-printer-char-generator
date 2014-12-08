@@ -1,7 +1,6 @@
 package fr.durss.thermal.views {
-	import fr.durss.thermal.controler.FrontControler;
-	import flash.events.MouseEvent;
 	import fr.durss.thermal.components.TToggleButton;
+	import fr.durss.thermal.controler.FrontControler;
 	import fr.durss.thermal.model.Model;
 	import fr.durss.thermal.vo.Metrics;
 	import fr.durss.thermal.vo.Mode;
@@ -10,10 +9,12 @@ package fr.durss.thermal.views {
 	import com.nurun.structure.environnement.label.Label;
 	import com.nurun.structure.mvc.model.events.IModelEvent;
 	import com.nurun.structure.mvc.views.AbstractView;
+	import com.nurun.structure.mvc.views.ViewLocator;
 	import com.nurun.utils.pos.PosUtils;
 	import com.nurun.utils.pos.roundPos;
 
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 
 	/**
 	 * Allows the user to switch between image and font mode
@@ -96,8 +97,9 @@ package fr.durss.thermal.views {
 		private function computePositions(event:Event = null):void {
 			PosUtils.hPlaceNext(10, _label, _fontMode, _bitmapMode);
 			PosUtils.vAlign(PosUtils.V_ALIGN_CENTER, 0, _label, _fontMode, _bitmapMode);
+			var form:OutputPanelView = ViewLocator.getInstance().locateViewByType(OutputPanelView) as OutputPanelView;
+			x = form.x + (form.width - width) * .5;
 			y = (Metrics.TOP_BAR_HEIGHT - height) * .5;
-			x = stage.stageWidth - width - 10;
 			
 			roundPos(this);
 		}
