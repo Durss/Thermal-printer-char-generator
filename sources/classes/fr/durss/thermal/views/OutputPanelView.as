@@ -58,7 +58,8 @@ package fr.durss.thermal.views {
 		private var _cbIncludeZones:TCheckBox;
 		private var _saveBt:TButton;
 		private var _loadBt:TButton;
-		private var _splitter:Shape;
+		private var _splitter : Shape;
+		private var _saveCodeBt : TButton;
 		
 		
 		
@@ -100,11 +101,15 @@ package fr.durss.thermal.views {
 			_cbCharHeaderCmdCommands.visible	= 
 			_cbMinimizeParams.visible			= 
 			_cbForceSize.visible				= model.currentMode == Mode.MODE_FONT_GLYPH;
+			_saveCodeBt.visible					= 
 			_cbIncludeZones.visible				= _bitmapMode;
 			_input.defaultLabel					= Label.getLabel( _bitmapMode? 'className' : 'charToreplace');
 			_input.textfield.restrict			= _bitmapMode? '[a-z][A-Z][0-9]' : '[0-9]';
 			_input.textfield.maxChars			= _bitmapMode? 30 : 3;
 			_input.clear();
+			if(model.currentInputValue != null) {
+				_input.value	= model.currentInputValue;
+			}
 			
 			gridDataUpdateHandler();
 			computePositions();
@@ -134,10 +139,14 @@ package fr.durss.thermal.views {
 			_cbIncludeZones				= _holder.addChild(new TCheckBox(Label.getLabel("includeZones"))) as TCheckBox;
 			_input						= _holder.addChild(new TInput(Label.getLabel('charToreplace'))) as TInput;
 			_copyBt						= _holder.addChild(new TButton(Label.getLabel('copyData'))) as TButton;
+			_saveCodeBt					= _holder.addChild(new TButton(Label.getLabel('saveCode'))) as TButton;
 			_textfield					= new ScrollableTextField('', 'code');
-			_textArea					= _holder.addChild(new ScrollPane(_textfield, new TScrollbar())) as ScrollPane;
+			_textArea					= _holder.addChild(new ScrollPane(_textfield, new TScrollbar(), new TScrollbar())) as ScrollPane;
 			
+			_copyBt.textBoundsMode					= false;
+			_saveCodeBt.textBoundsMode				= false;
 			_copyBt.enabled							= false;
+			_textfield.autoWrap						= false;
 			_textfield.selectable					= true;
 			_textArea.autoHideScrollers				= true;
 			_cbUserDefineCommands.selected			= 
@@ -146,7 +155,7 @@ package fr.durss.thermal.views {
 			_cbForceSize.selected					= 
 			_cbLineBreak.selected					= 
 			_cbIncludeZones.selected				= 
-			_cbFormatCodeCommands.selected			= true; 
+			_cbFormatCodeCommands.selected			= true;
 			
 			addEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);
 			_hexaValues.addEventListener(Event.CHANGE, updateFormHandler);
@@ -162,6 +171,7 @@ package fr.durss.thermal.views {
 			_copyBt.addEventListener(MouseEvent.CLICK, copyHandler);
 			_saveBt.addEventListener(MouseEvent.CLICK, saveLoadHandler);
 			_loadBt.addEventListener(MouseEvent.CLICK, saveLoadHandler);
+			_saveCodeBt.addEventListener(MouseEvent.CLICK, saveLoadHandler);
 			ViewLocator.getInstance().addEventListener(ViewEvent.GRID_DATA_UPDATE, gridDataUpdateHandler);
 			ViewLocator.getInstance().addEventListener(ViewEvent.ZONE_LIST_UPDATE, zoneListUpdateHandler);
 		}
@@ -188,6 +198,7 @@ package fr.durss.thermal.views {
 		 * Called when input looses focus
 		 */
 		private function focusOutInputHandler(event:FocusEvent):void {
+			if(_bitmapMode) FrontControler.getInstance().setInputParam(_input.text);
 			if(_input.text.length == 0 || _input.text == _input.defaultLabel || _bitmapMode) return;
 			
 			var char:int = parseInt(_input.text);
@@ -195,6 +206,7 @@ package fr.durss.thermal.views {
 			if(char < 32) char = 33;
 			if(char > 126) char = 126;
 			_input.text = char.toString();
+			FrontControler.getInstance().setInputParam(_input.text);
 			
 		}
 		
@@ -229,6 +241,12 @@ package fr.durss.thermal.views {
 			_input.width = Math.max(_hexaValues.width, _cbUserDefineCommands.width, _cbCharHeaderCmdCommands.width, _cbFormatCodeCommands.width, _cbLineBreak.width, _cbIncludeZones.width);
 			
 			PosUtils.hCenterIn(_copyBt, _input);
+			if(_bitmapMode) {
+				var space:int = (_input.width - _saveCodeBt.width - _copyBt.width) / 3;
+				_copyBt.x = space;
+				_saveCodeBt.x = _input.width - _saveCodeBt.width - space;
+				_saveCodeBt.y = _copyBt.y;
+			}
 			
 			_loadBt.y			= _saveBt.y;
 			_saveBt.x			= Math.round(_loadBt.width + margin);
@@ -296,16 +314,20 @@ package fr.durss.thermal.views {
 					formated			+= '#define ' + name + '_height '+_currentData.areaSource.height+'\n\n';
 					//Add zones infos
 					if(_cbIncludeZones.selected && _zoneList != null && _zoneList.length > 0) {
-						formated	+= '//Define zone bounds\n';
-						var i:int, len:int, zone:ZoneData, zName:String;
+						var i:int, len:int, zone:ZoneData, zName:String, bitOffset:Number, byteOffset:Number, bitSubOffset:int, bitLength:int;
 						len = _zoneList.length;
 						for(i = 0; i < len; ++i) {
 							zone		= _zoneList[i];
-							zName		= zone.name.split(/\n|\r/)[0];//Keep only first line of the name
-							formated	+= '#define ' + zName + '_x '+(zone.area.x - _currentData.areaSource.x)+'\n';
-							formated	+= '#define ' + zName + '_y '+(zone.area.y - _currentData.areaSource.y)+'\n';
-							formated	+= '#define ' + zName + '_width '+(zone.area.width)+'\n';
-							formated	+= '#define ' + zName + '_height '+(zone.area.height)+'\n\n';
+							zName		= zone.name.replace(' ', '_').split(/\n|\r/)[0];//Keep only first line of the name
+							bitOffset	= (zone.area.x - _currentData.areaSource.x)%_currentData.areaSource.width + (zone.area.y - _currentData.areaSource.y) * _currentData.areaSource.width;
+							byteOffset	= Math.floor(bitOffset/8);
+							bitSubOffset= 7 - (bitOffset%8);
+							bitLength	= zone.area.width * zone.area.height;
+							formated	+= '//Define ' + zName + ' zone bounds (' + zone.area.width + 'x' + zone.area.height + 'px)\n';
+							formated	+= '#define ' + zName + '_byteOffset '+byteOffset+'		//Byte chunk where the zone starts\n';
+							formated	+= '#define ' + zName + '_bitSubOffset '+bitSubOffset+' 		//Bit of the byte chunk where the zone starts (left/hight bit=7 right/low bit=0)\n';
+							formated	+= '#define ' + zName + '_bitLength '+bitLength+'		//Size of the zone in bits\n';
+							formated	+= '#define ' + zName + '_bitWidth '+zone.area.width+'			//Width of the zone in bits\n\n';
 						}
 					}
 					formated			+= 'static const PROGMEM uint8_t ' + name + '_data[] = {';
@@ -378,6 +400,9 @@ package fr.durss.thermal.views {
 				FrontControler.getInstance().save();
 			}else if(event.currentTarget == _loadBt){
 				FrontControler.getInstance().load();
+			}else if(event.currentTarget == _saveCodeBt) {
+				//TODO
+				FrontControler.getInstance().saveCode(_currentFormatedData, _input.text);
 			}
 		}
 		

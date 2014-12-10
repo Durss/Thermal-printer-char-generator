@@ -31,7 +31,7 @@ package fr.durss.thermal {
 	 * @date 6 déc. 2014;
 	 */
 	 
-	[SWF(width="1280", height="600", backgroundColor="0xFFFFFF", frameRate="31")]
+	[SWF(width="1280", height="720", backgroundColor="0xFFFFFF", frameRate="31")]
 	[Frame(factoryClass="fr.durss.thermal.ApplicationLoader")]
 	public class Application extends MovieClip {
 		private var _model : Model;
@@ -85,7 +85,7 @@ package fr.durss.thermal {
 			addChild(new OutputPanelView());
 			addChild(new ModeView());
 			_git = addChild(new TButton('View on Github', 'button', new GitIconGraphic())) as TButton;
-			_git.filters = [new DropShadowFilter(0,0,0,.3,5,5,1,2)]
+			_git.filters = [new DropShadowFilter(0,0,0,.3,5,5,1,2)];
 			
 //			_form.addEventListener(Event.CHANGE, changeFormDataHandler);
 //			_form.addEventListener(Event.CLEAR, clearGridHandler);

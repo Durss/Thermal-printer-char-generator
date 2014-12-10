@@ -43,7 +43,7 @@ package fr.durss.thermal.utils {
 				&& serializableClasses[i] != String) {
 					lenJ = nodes.length();
 					for(j = 0; j < lenJ; ++j) {
-						if(nodes[j].@access != "readwrite") {
+						if(nodes[j].@access != "readwrite" && cName != 'ByteArray') {
 							trace("Class "+cName+"'s '"+nodes[j].@name+"' property is '"+nodes[j].@access+"'. Must be 'readwrite'.");
 						}
 					}

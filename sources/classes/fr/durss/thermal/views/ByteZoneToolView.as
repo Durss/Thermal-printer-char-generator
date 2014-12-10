@@ -142,8 +142,6 @@ package fr.durss.thermal.views {
 		private function clickItemHandler(event:MouseEvent):void {
 			var bt:ZoneItem = event.target as ZoneItem;
 			if(bt.mouseX < bt.textfield.x) {
-				bt.dispose();
-				_btHolder.removeChild(bt);
 				var i:int, len:int;
 				len = _zones.length;
 				for(i = 0; i < len; ++i) {
@@ -153,6 +151,9 @@ package fr.durss.thermal.views {
 					}
 				}
 				FrontControler.getInstance().deleteZone(bt.data);
+				
+				bt.dispose();
+				_btHolder.removeChild(bt);
 				
 				if(_zones.length == 0) {
 					_infos.text = Label.getLabel('zoneInfos') + Label.getLabel('zoneHelp');

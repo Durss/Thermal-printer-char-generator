@@ -2,6 +2,7 @@ package fr.durss.thermal.components {
 	import fr.durss.thermal.graphics.ComboboxArrowIcon;
 
 	import com.nurun.components.button.IconAlign;
+	import com.nurun.components.button.TextAlign;
 	import com.nurun.components.form.ComboBox;
 	import com.nurun.components.form.events.ListEvent;
 
@@ -32,6 +33,7 @@ package fr.durss.thermal.components {
 		public function TComboBox(label:String, openToTop:Boolean = false) {
 			_defaultLabel = label;
 			var bt:TButton = new TButton(label, "button", new ComboboxArrowIcon());
+			bt.textAlign = TextAlign.LEFT;
 			super(bt, new TScrollbar(), null, null, openToTop);
 			list.scrollableList.allowMultipleSelection = false;
 			list.scrollableList.group.allowNoSelection = false;

@@ -1,6 +1,6 @@
 package fr.durss.thermal.components {
-	import fr.durss.thermal.graphics.ButtonGraphic;
 	import fr.durss.thermal.graphics.ButtonSelectedGraphic;
+	import fr.durss.thermal.graphics.ToggleButtonGraphic;
 
 	import com.nurun.components.button.IconAlign;
 	import com.nurun.components.button.visitors.CssVisitor;
@@ -29,7 +29,7 @@ package fr.durss.thermal.components {
 		 * Creates an instance of <code>TToggleButton</code>.
 		 */
 		public function TToggleButton(label:String, css:String = "button", icon:DisplayObject = null) {
-			super(label, css, css+"_selected", new ButtonGraphic(), new ButtonSelectedGraphic(), icon, icon);
+			super(label, css, css+"_selected", new ToggleButtonGraphic(), new ButtonSelectedGraphic(), icon, icon);
 			var fv:FrameVisitor = new FrameVisitor();
 			var options:FrameVisitorOptions = new FrameVisitorOptions("out", "over", "down", "disabled", true, .25);
 			fv.addTarget(defaultBackground as MovieClip, options);

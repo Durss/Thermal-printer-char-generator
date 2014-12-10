@@ -143,6 +143,21 @@ package fr.durss.thermal.controler {
 		public function save():void {
 			_model.save();
 		}
+		
+		/**
+		 * Saves the code to a .h file
+		 */
+		public function saveCode(data:String, name:String):void {
+			_model.saveCode(data, name);
+		}
+		
+		/**
+		 * Sets the input's param.
+		 * Contains the char index in font mode and the file's name in bitmap mode
+		 */
+		public function setInputParam(name:String):void {
+			_model.setInputParam(name);
+		}
 
 
 		

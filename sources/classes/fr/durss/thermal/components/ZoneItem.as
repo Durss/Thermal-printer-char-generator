@@ -1,4 +1,5 @@
 package fr.durss.thermal.components {
+	import flash.text.TextField;
 	import fr.durss.thermal.controler.FrontControler;
 	import fr.durss.thermal.events.ViewEvent;
 	import fr.durss.thermal.graphics.ZoneItemGraphic;
@@ -14,6 +15,7 @@ package fr.durss.thermal.components {
 
 	import flash.events.Event;
 	import flash.events.FocusEvent;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.text.TextFieldType;
 	
@@ -42,7 +44,7 @@ package fr.durss.thermal.components {
 			textAlign = TextAlign.LEFT;
 			iconAlign = IconAlign.LEFT;
 			iconSpacing = 6;
-			textfield.restrict = "[a-z][A-Z][0-9]_";
+			textfield.restrict = "[a-z][A-Z][0-9]_ ";
 			contentMargin = new Margin(5, 2, 5, 2);
 			
 			textfield.addEventListener(Event.CHANGE, changeLabelHandler);
@@ -115,6 +117,12 @@ package fr.durss.thermal.components {
 			label = data.name = textfield.text;
 			validate();
 			dispatchEvent(event);
+		}
+		
+		//prevent from "clicking" the button when space or enter is pressed while writing text
+		override protected function keyUpHandler(event:KeyboardEvent):void {
+			if(event.target is TextField) return;
+			super.keyUpHandler(event);
 		}
 		
 	}

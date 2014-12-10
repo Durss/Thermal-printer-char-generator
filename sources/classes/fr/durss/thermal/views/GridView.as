@@ -1,4 +1,5 @@
 package fr.durss.thermal.views {
+	import com.nurun.utils.pos.roundPos;
 	import fr.durss.thermal.components.CopyOverlay;
 	import fr.durss.thermal.controler.FrontControler;
 	import fr.durss.thermal.events.ViewEvent;
@@ -69,6 +70,7 @@ package fr.durss.thermal.views {
 		private var _zoneTL:Point;
 		private var _zoneBR:Point;
 		private var _patternZone:BitmapData;
+		private var _limitRect:Rectangle;
 		
 		
 		
@@ -111,6 +113,16 @@ package fr.durss.thermal.views {
 				model.currentData.bmd.position = 0;
 				_bmd.setPixels(_bmd.rect, model.currentData.bmd);
 			}
+			doGenerateBin();
+			if(_limits.width > 0 && _limits.height > 0) {
+				var form:OutputPanelView = ViewLocator.getInstance().locateViewByType(OutputPanelView) as OutputPanelView;
+				var center:Point = localToGlobal(new Point((stage.stageWidth - form.width) * .5, (stage.stageHeight-Metrics.TOP_BAR_HEIGHT) * .5));
+				center.y += Metrics.TOP_BAR_HEIGHT;
+				center = globalToLocal(center);
+				_board.x = center.x - _limitRect.x - _limitRect.width *.5;
+				_board.y = center.y - _limitRect.y - _limitRect.height * .5;
+				roundPos(_board);
+			}
 		}
 
 
@@ -130,6 +142,7 @@ package fr.durss.thermal.views {
 			_zoneTL			= new Point();
 			_zoneBR			= new Point();
 			_zoneData		= new Rectangle();
+			_limitRect		= new Rectangle();
 			_board			= addChild(new Sprite()) as Sprite;
 			_bitmap			= _board.addChild(new Bitmap()) as Bitmap;
 			_grid			= _board.addChild(new Sprite()) as Sprite;
@@ -263,11 +276,13 @@ package fr.durss.thermal.views {
 						_zoneData.y += _zoneData.height;
 						_zoneData.height = Math.abs(_zoneData.height);
 					}
-					if(_zoneData.width > 0 && _zoneData.height > 0) {
+					if(_zoneData.width > 1 || _zoneData.height > 1) {
 						TweenLite.to(_zone, .25, {alpha:0, delay:.25});
 						FrontControler.getInstance().registerZone(_zoneData.clone());
-						_zoneData.width = _zoneData.height = 0;//Reset area
+					}else{
+						_zone.alpha = 0;
 					}
+					_zoneData.width = _zoneData.height = 0;//Reset area
 				}
 			}else if(event.type == MouseEvent.MIDDLE_MOUSE_UP){
 				_middlePressed = false;
@@ -396,6 +411,10 @@ package fr.durss.thermal.views {
 			
 			//Draw limitrect
 			if(!_forceFullSize || _bitmapMode) {
+				_limitRect.x = rect.x * _cellSize + _bitmap.x - 2;
+				_limitRect.y = rect.y * _cellSize + _bitmap.y - 2;
+				_limitRect.width = rect.width * _cellSize + 1 + 4;
+				_limitRect.height = rect.height * _cellSize + 1 + 4;
 				// Draw white layer
 				var m:Matrix = new Matrix();
 				m.translate(_bitmap.x, _bitmap.y);
@@ -403,10 +422,7 @@ package fr.durss.thermal.views {
 				_limits.graphics.drawRect(_bitmap.x, _bitmap.y, _grid.width, _grid.height);
 				//Draw border
 				_limits.graphics.lineStyle(2, 0x0000cc);
-				_limits.graphics.drawRect(	rect.x * _cellSize + _bitmap.x,
-											rect.y * _cellSize + _bitmap.y,
-											rect.width * _cellSize + 1,
-											rect.height * _cellSize + 1);
+				_limits.graphics.drawRect( _limitRect.x, _limitRect.y, _limitRect.width, _limitRect.height);
 			}
 			
 			var ba:ByteArray = new ByteArray();
@@ -530,7 +546,7 @@ package fr.durss.thermal.views {
 			
 			//Creates/updates the disable zone pattern
 			src.graphics.clear();
-			src.graphics.lineStyle(0, 0xcccccc, 1, true);
+			src.graphics.lineStyle(0, 0x777777, 1, true);
 			src.graphics.moveTo(10, 0);
 			src.graphics.lineTo(0, 10);
 			_patternDisable	= new BitmapData(src.width, src.height, true,0);
@@ -606,9 +622,11 @@ package fr.durss.thermal.views {
 			_zone.graphics.drawRect(_zoneData.x * _cellSize, _zoneData.y * _cellSize, _zoneData.width * _cellSize, _zoneData.height * _cellSize);
 			_zone.graphics.endFill();
 			
+			_limits.graphics.clear();
+			
 			renderPatterns();
 			computePositions();
-			doGenerateBin();
+			generateBin();
 		}
 		
 		/**

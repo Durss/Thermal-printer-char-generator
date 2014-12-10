@@ -28,6 +28,7 @@ package fr.durss.thermal.model {
 		private var _currentMode:String;
 		private var _zones:Vector.<ZoneData>;
 		private var _currentData:GridData;
+		private var _currentInputValue:String;
 		
 		
 		
@@ -56,6 +57,12 @@ package fr.durss.thermal.model {
 		 * Gets the current grid's data
 		 */
 		public function get currentData():GridData { return _currentData; }
+		
+		/**
+		 * Gets the current input's value
+		 * Contains the char index in font mode and the file's name in bitmap mode
+		 */
+		public function get currentInputValue():String { return _currentInputValue; }
 
 
 
@@ -179,10 +186,26 @@ package fr.durss.thermal.model {
 			var file:ByteArray = new ByteArray();
 			file.writeUnsignedInt(FileVersion.VERSION);
 			file.writeUTF(_currentMode);
+			file.writeUTF(_currentInputValue);
 			file.writeObject(_currentData);
 			file.writeObject(_zones);
 			
 			new FileReference().save(file, 'export_configuration.thrm');
+		}
+		
+		/**
+		 * Saves the code to a .h file
+		 */
+		public function saveCode(data:String, name:String):void {
+			new FileReference().save(data, name+'.h');
+		}
+		
+		/**
+		 * Sets the input's param.
+		 * Contains the char index in font mode and the file's name in bitmap mode
+		 */
+		public function setInputParam(name:String):void {
+			_currentInputValue = name;
 		}
 
 
@@ -237,9 +260,10 @@ package fr.durss.thermal.model {
 			var ba:ByteArray = event.data as ByteArray;
 			switch(ba.readUnsignedInt()){
 				case 1:
-					_currentMode	= ba.readUTF();
-					_currentData	= ba.readObject();
-					_zones			= ba.readObject();
+					_currentMode		= ba.readUTF();
+					_currentInputValue	= ba.readUTF();
+					_currentData		= ba.readObject();
+					_zones				= ba.readObject();
 					var i:int, len:int;
 					len = _zones.length;
 					for(i = 0; i < len; ++i) {

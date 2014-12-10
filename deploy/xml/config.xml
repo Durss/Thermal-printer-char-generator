@@ -39,6 +39,7 @@
 		<label code="charToreplace"><![CDATA[Char index to edit (31 < n < 127 )]]></label>
 		<label code="className"><![CDATA[Bitmap's name...]]></label>
 		<label code="copyData"><![CDATA[Copy code]]></label>
+		<label code="saveCode"><![CDATA[Save code]]></label>
 		<label code="clearGrid"><![CDATA[Clear]]></label>
 		<label code="minimizeParams"><![CDATA[Minimize parameters]]></label>
 		<label code="fontListTitle"><![CDATA[Font...]]></label>
