@@ -8,14 +8,17 @@ Allows to easily generate Arduino compatible C code to create and print custom f
 
 ## The generated code is meant to be used with the Adafruit's library :
  https://github.com/adafruit/Adafruit-Thermal-Printer-Library
+ 
 But you can definitely tweak it to use it with or without any other library.
 
 ## Tweaking Adafruit Library
  Regarding the Adafruit's library, as of its 2014 version, by default writeBytes() methods are private, think about making them public inside the Adafruit_Thermal.h file.
 If you don't know how to do that, you can copy/paste the file from this repository (see "Adafruit_Thermal.h" file) into your local libraries.
 
-#### You should find your local libraries at this location on Windows :
+#### As of Arduino IDE 2017, you should find your local libraries at this location on Windows :
 C:\Users\{YOUR USER NAME}\Documents\Arduino\libraries\Adafruit_Thermal
+
+It probably has changed now.
 
 
 ## You can find the tool here :
