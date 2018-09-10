@@ -1,5 +1,4 @@
 package fr.durss.thermal.utils {
-	import flash.display.BitmapData;
 	import fr.durss.thermal.vo.GridData;
 	import fr.durss.thermal.vo.ZoneData;
 

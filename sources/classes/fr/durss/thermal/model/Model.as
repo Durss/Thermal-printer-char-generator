@@ -9,11 +9,13 @@ package fr.durss.thermal.model {
 	import com.nurun.structure.mvc.model.IModel;
 	import com.nurun.structure.mvc.model.events.ModelEvent;
 	import com.nurun.structure.mvc.views.ViewLocator;
-	import com.nurun.utils.color.ColorFunctions;
 	import com.nurun.utils.commands.BrowseForFileCmd;
+	import com.unitzeroone.fx.ImageDithering;
+	import com.unitzeroone.fx.ImageDitheringType;
 
 	import flash.display.BitmapData;
 	import flash.events.EventDispatcher;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
@@ -186,7 +188,7 @@ package fr.durss.thermal.model {
 			var file:ByteArray = new ByteArray();
 			file.writeUnsignedInt(FileVersion.VERSION);
 			file.writeUTF(_currentMode);
-			file.writeUTF(_currentInputValue);
+			file.writeUTF(_currentInputValue == null? '' : _currentInputValue);
 			file.writeObject(_currentData);
 			file.writeObject(_zones);
 			
@@ -234,21 +236,15 @@ package fr.durss.thermal.model {
 		private function loadImageCompleteHandler(event:CommandEvent):void {
 			var tmp:BitmapData = event.data as BitmapData;
 			tmp.lock();
-
-			var bmd:BitmapData = new BitmapData(Math.min(600, tmp.width), Math.min(1000, tmp.height), true, 0);
-			bmd.lock();
 			
-			var i:int, len:int, x:int, y:int;
-			len = bmd.width * bmd.height;
-			for(i = 0; i < len; ++i) {
-				x = i%bmd.width;
-				y = Math.round(i/bmd.width);
-				if(ColorFunctions.getLuminosity(tmp.getPixel(x, y)) > 200) {
-					bmd.setPixel32(x, y, 0);
-				}else{
-					bmd.setPixel32(x, y, 0xffff0000);
-				}
-			}
+			var bmd:BitmapData = new BitmapData(Math.min(600, tmp.width), Math.min(1000, tmp.height), true, 0);
+			bmd.draw(tmp);
+			bmd.lock();
+
+			ImageDithering.dither(bmd, ImageDitheringType.STUCKI, 1, true);
+			bmd.threshold(bmd, bmd.rect, new Point(0,0), "==", 0xffffffff, 0, 0xffffffff);
+			bmd.threshold(bmd, bmd.rect, new Point(0,0), "==", 0xff000000, 0xffff0000, 0xffffffff);
+			
 			ViewLocator.getInstance().dispatchEvent(new ViewEvent(ViewEvent.GENERATE_FROM_BMD, bmd));
 		}
 		

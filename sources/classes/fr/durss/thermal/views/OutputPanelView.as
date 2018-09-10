@@ -1,4 +1,6 @@
 package fr.durss.thermal.views {
+	import com.nurun.structure.environnement.configuration.Config;
+	import flash.utils.ByteArray;
 	import fr.durss.thermal.graphics.LoadIconGraphic;
 	import fr.durss.thermal.graphics.SaveIconGraphic;
 	import com.nurun.utils.draw.createRect;
@@ -39,6 +41,10 @@ package fr.durss.thermal.views {
 	 * @date 6 déc. 2014;
 	 */
 	public class OutputPanelView extends AbstractView {
+		
+		[Embed(source="../../../../../assets/codeSample.txt", mimeType="application/octet-stream")]
+		private var _codeSample:Class;
+		
 		private var _cbUserDefineCommands:TCheckBox;
 		private var _cbCharHeaderCmdCommands:TCheckBox;
 		private var _cbFormatCodeCommands:TCheckBox;
@@ -60,6 +66,7 @@ package fr.durss.thermal.views {
 		private var _loadBt:TButton;
 		private var _splitter : Shape;
 		private var _saveCodeBt : TButton;
+		private var _cbMergeSample : TCheckBox;
 		
 		
 		
@@ -103,6 +110,7 @@ package fr.durss.thermal.views {
 			_cbForceSize.visible				= model.currentMode == Mode.MODE_FONT_GLYPH;
 			_saveCodeBt.visible					= 
 			_cbIncludeZones.visible				= _bitmapMode;
+			_cbMergeSample.visible				= _bitmapMode && _zoneList != null && _zoneList.length > 0;
 			_input.defaultLabel					= Label.getLabel( _bitmapMode? 'className' : 'charToreplace');
 			_input.textfield.restrict			= _bitmapMode? '[a-z][A-Z][0-9]' : '[0-9]';
 			_input.textfield.maxChars			= _bitmapMode? 30 : 3;
@@ -137,6 +145,7 @@ package fr.durss.thermal.views {
 			_cbForceSize				= _holder.addChild(new TCheckBox(Label.getLabel("forceSize"))) as TCheckBox;
 			_cbLineBreak				= _holder.addChild(new TCheckBox(Label.getLabel("lineBreaks"))) as TCheckBox;
 			_cbIncludeZones				= _holder.addChild(new TCheckBox(Label.getLabel("includeZones"))) as TCheckBox;
+			_cbMergeSample				= _holder.addChild(new TCheckBox(Label.getLabel('injectSample'))) as TCheckBox;
 			_input						= _holder.addChild(new TInput(Label.getLabel('charToreplace'))) as TInput;
 			_copyBt						= _holder.addChild(new TButton(Label.getLabel('copyData'))) as TButton;
 			_saveCodeBt					= _holder.addChild(new TButton(Label.getLabel('saveCode'))) as TButton;
@@ -149,6 +158,7 @@ package fr.durss.thermal.views {
 			_textfield.autoWrap						= false;
 			_textfield.selectable					= true;
 			_textArea.autoHideScrollers				= true;
+			_cbMergeSample.selected					= false;
 			_cbUserDefineCommands.selected			= 
 			_cbCharHeaderCmdCommands.selected		= 
 			_cbMinimizeParams.selected				= 
@@ -166,21 +176,15 @@ package fr.durss.thermal.views {
 			_cbForceSize.addEventListener(Event.CHANGE, updateFormHandler);
 			_cbLineBreak.addEventListener(Event.CHANGE, updateFormHandler);
 			_cbIncludeZones.addEventListener(Event.CHANGE, updateFormHandler);
+			_cbMergeSample.addEventListener(Event.CHANGE, updateFormHandler);
 			_input.addEventListener(Event.CHANGE, updateFormHandler);
 			_input.addEventListener(FocusEvent.FOCUS_OUT, focusOutInputHandler);
-			_copyBt.addEventListener(MouseEvent.CLICK, copyHandler);
-			_saveBt.addEventListener(MouseEvent.CLICK, saveLoadHandler);
-			_loadBt.addEventListener(MouseEvent.CLICK, saveLoadHandler);
-			_saveCodeBt.addEventListener(MouseEvent.CLICK, saveLoadHandler);
+			_copyBt.addEventListener(MouseEvent.CLICK, clickButtonHandler);
+			_saveBt.addEventListener(MouseEvent.CLICK, clickButtonHandler);
+			_loadBt.addEventListener(MouseEvent.CLICK, clickButtonHandler);
+			_saveCodeBt.addEventListener(MouseEvent.CLICK, clickButtonHandler);
 			ViewLocator.getInstance().addEventListener(ViewEvent.GRID_DATA_UPDATE, gridDataUpdateHandler);
 			ViewLocator.getInstance().addEventListener(ViewEvent.ZONE_LIST_UPDATE, zoneListUpdateHandler);
-		}
-		
-		/**
-		 * Called when copy button is clicked to copy the data
-		 */
-		private function copyHandler(event:MouseEvent):void {
-			Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, _currentFormatedData);
 		}
 		
 		/**
@@ -227,7 +231,7 @@ package fr.durss.thermal.views {
 			
 			var margin:int = 10;
 			_holder.x = _holder.y = margin;
-			var items:Array = [_saveBt, _splitter, _hexaValues, _cbUserDefineCommands, _cbCharHeaderCmdCommands, _cbFormatCodeCommands, _cbMinimizeParams, _cbForceSize, _cbLineBreak, _cbIncludeZones, _input, _copyBt, _textArea];
+			var items:Array = [_saveBt, _splitter, _hexaValues, _cbUserDefineCommands, _cbCharHeaderCmdCommands, _cbFormatCodeCommands, _cbMinimizeParams, _cbForceSize, _cbLineBreak, _cbIncludeZones, _cbMergeSample, _input, _copyBt, _textArea];
 			var i:int, len:int;
 			len = items.length;
 			for(i = 0; i < len; ++i) {
@@ -238,7 +242,7 @@ package fr.durss.thermal.views {
 				}
 			}
 			PosUtils.vPlaceNext(10, items);
-			_input.width = Math.max(_hexaValues.width, _cbUserDefineCommands.width, _cbCharHeaderCmdCommands.width, _cbFormatCodeCommands.width, _cbLineBreak.width, _cbIncludeZones.width);
+			_input.width = Math.max(_hexaValues.width, _cbUserDefineCommands.width, _cbCharHeaderCmdCommands.width, _cbFormatCodeCommands.width, _cbLineBreak.width, _cbIncludeZones.width, _cbMergeSample.width);
 			
 			PosUtils.hCenterIn(_copyBt, _input);
 			if(_bitmapMode) {
@@ -305,6 +309,7 @@ package fr.durss.thermal.views {
 				}
 				_currentFormatedData = result.join(',').replace(/,\n,/gi, ',\n');
 				
+				var varType:String = 'const PROGMEM ';
 				if(_cbFormatCodeCommands.selected) {
 					var name:String		 =_input.text != _input.defaultLabel && _input.text.length > 0? _input.text : 'bitmap';
 					var formated:String	 = '#ifndef _' + name + '_h_\n';
@@ -315,6 +320,7 @@ package fr.durss.thermal.views {
 					//Add zones infos
 					if(_cbIncludeZones.selected && _zoneList != null && _zoneList.length > 0) {
 						var i:int, len:int, zone:ZoneData, zName:String, bitOffset:Number, byteOffset:Number, bitSubOffset:int, bitLength:int;
+						varType = '';
 						len = _zoneList.length;
 						for(i = 0; i < len; ++i) {
 							zone		= _zoneList[i];
@@ -326,17 +332,27 @@ package fr.durss.thermal.views {
 							formated	+= '//Define ' + zName + ' zone bounds (' + zone.area.width + 'x' + zone.area.height + 'px)\n';
 							formated	+= '#define ' + zName + '_byteOffset '+byteOffset+'		//Byte chunk where the zone starts\n';
 							formated	+= '#define ' + zName + '_bitSubOffset '+bitSubOffset+' 		//Bit of the byte chunk where the zone starts (left/hight bit=7 right/low bit=0)\n';
-							formated	+= '#define ' + zName + '_bitLength '+bitLength+'		//Size of the zone in bits\n';
+//							formated	+= '#define ' + zName + '_bitLength '+bitLength+'		//Size of the zone in bits\n';
 							formated	+= '#define ' + zName + '_bitWidth '+zone.area.width+'			//Width of the zone in bits\n\n';
 						}
 					}
-					formated			+= 'static const PROGMEM uint8_t ' + name + '_data[] = {';
+					formated			+= 'static '+varType+'uint8_t ' + name + '_data[] = {';
 					if(_cbLineBreak.selected) formated += '\n';
 					formated			+= _currentFormatedData;
 					if(_cbLineBreak.selected) formated += '\n';
 					formated			+= '};\n';
 					formated			+= '#endif\n';
 					_currentFormatedData = formated;
+				}
+				
+				if(_cbMergeSample.selected) {
+					var data:ByteArray = new _codeSample();
+					_currentFormatedData += "\n\n"+data.readUTFBytes(data.bytesAvailable).replace(/(\r|\n){2}/gi, '\n');
+				}else{
+					_currentFormatedData += "\n\n";
+					_currentFormatedData += '// See this file for an example on how to make use\n';
+					_currentFormatedData += '// of the "Zones" feature to merge an image with another\n';
+					_currentFormatedData += '// '+Config.getUncomputedPath("mergeSampleFile");
 				}
 				
 			}else{
@@ -355,7 +371,6 @@ package fr.durss.thermal.views {
 					result.push(formatByte(27),
 								formatByte(38),
 								formatByte(height/8),
-								formatByte(char),
 								formatByte(char),
 								formatByte(width));
 					result.push('');
@@ -388,20 +403,23 @@ package fr.durss.thermal.views {
 		 * Called when a zone is created/deleted
 		 */
 		private function zoneListUpdateHandler(event:ViewEvent):void {
-			_zoneList = event.data as Vector.<ZoneData>;
+			_zoneList				= event.data as Vector.<ZoneData>;
+			_cbMergeSample.visible	= _bitmapMode && _zoneList != null && _zoneList.length > 0;
 			gridDataUpdateHandler();
+			computePositions();
 		}
 		
 		/**
-		 * Called when save or load button is clicked
+		 * Called when a button is clicked
 		 */
-		private function saveLoadHandler(event:MouseEvent):void {
+		private function clickButtonHandler(event:MouseEvent):void {
 			if(event.currentTarget == _saveBt) {
 				FrontControler.getInstance().save();
+			}else if(event.currentTarget == _copyBt){
+				Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, _textfield.text);
 			}else if(event.currentTarget == _loadBt){
 				FrontControler.getInstance().load();
 			}else if(event.currentTarget == _saveCodeBt) {
-				//TODO
 				FrontControler.getInstance().saveCode(_currentFormatedData, _input.text);
 			}
 		}

@@ -1,10 +1,8 @@
 package fr.durss.thermal.components {
-	import flash.display.Shape;
-	import flash.display.BlendMode;
-	import gs.TweenLite;
-	import flash.filters.DropShadowFilter;
 	import fr.durss.thermal.graphics.CancelBubbleGraphic;
 	import fr.durss.thermal.graphics.SubmitBubbleGraphic;
+
+	import gs.TweenLite;
 
 	import com.nurun.components.button.GraphicButton;
 	import com.nurun.components.button.visitors.applyDefaultFrameVisitor;
@@ -13,8 +11,11 @@ package fr.durss.thermal.components {
 	import com.nurun.utils.pos.roundPos;
 
 	import flash.display.BitmapData;
+	import flash.display.BlendMode;
+	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.filters.DropShadowFilter;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	

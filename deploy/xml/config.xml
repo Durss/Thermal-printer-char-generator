@@ -7,6 +7,7 @@
 	<paths>	
 		<path code="baseURL"><![CDATA[]]></path>
 		<path code="resourcesURL"><![CDATA[./]]></path>
+		<path code="mergeSampleFile"><![CDATA[https://github.com/Durss/Thermal-printer-char-generator/blob/master/MergeSample.c]]></path>
 	</paths>
 
 	<vars>
@@ -40,6 +41,7 @@
 		<label code="className"><![CDATA[Bitmap's name...]]></label>
 		<label code="copyData"><![CDATA[Copy code]]></label>
 		<label code="saveCode"><![CDATA[Save code]]></label>
+		<label code="injectSample"><![CDATA[Include merge code sample]]></label>
 		<label code="clearGrid"><![CDATA[Clear]]></label>
 		<label code="minimizeParams"><![CDATA[Minimize parameters]]></label>
 		<label code="fontListTitle"><![CDATA[Font...]]></label>
@@ -51,7 +53,7 @@
 		<label code="includeZones"><![CDATA[Include zones]]></label>
 		<label code="browseLabel"><![CDATA[Select an image :]]></label>
 		<label code="browse"><![CDATA[Browse...]]></label>
-		<label code="browseInfos"><![CDATA[Images larger/higher than 600x1000 will be cropped.<br />Only pixels with 80% of brightness will be kept.]]></label>
+		<label code="browseInfos"><![CDATA[Images larger/higher than 600x1000 will be cropped.<br />A dither filter is applied to convert from RGB do B&W.]]></label>
 		<label code="zoneTool"><![CDATA[Zones]]></label>
 		<label code="zoneInfos"><![CDATA[Draw a rectangle area inside your image. Its coordinates will be set as constants in the generated code.<br />This will make easier to inject an other image later inside your Arduino program.<br /><br />Click an item's label to edit its name, click cross to delete it.]]></label>
 		<label code="zoneHelp"><![CDATA[<br /><br /><span class="highlight">- Draw a rectangle on the grid to add a new zone -</span>]]></label>

@@ -70,7 +70,8 @@ package fr.durss.thermal.views {
 		private var _zoneTL:Point;
 		private var _zoneBR:Point;
 		private var _patternZone:BitmapData;
-		private var _limitRect:Rectangle;
+		private var _limitRect : Rectangle;
+		private var _patternLimit : BitmapData;
 		
 		
 		
@@ -327,7 +328,7 @@ package fr.durss.thermal.views {
 					_zoneBR.y			= Math.max(_dragOffset.y, _board.mouseY);
 					_zoneData.x			= Math.floor(_zoneTL.x/_cellSize);
 					_zoneData.y			= Math.floor(_zoneTL.y/_cellSize);
-					_zoneData.width		= Math.ceil((_zoneBR.x - _zoneData.x * _cellSize)/_cellSize);
+					_zoneData.width		= Math.ceil(Math.ceil((_zoneBR.x - _zoneData.x * _cellSize)/_cellSize)/8)*8;
 					_zoneData.height	= Math.ceil((_zoneBR.y - _zoneData.y * _cellSize)/_cellSize);
 					_zone.alpha = 1;
 					_zone.graphics.clear();
@@ -420,8 +421,12 @@ package fr.durss.thermal.views {
 				m.translate(_bitmap.x, _bitmap.y);
 				_limits.graphics.beginBitmapFill(_patternDisable, m);
 				_limits.graphics.drawRect(_bitmap.x, _bitmap.y, _grid.width, _grid.height);
+				_limits.graphics.drawRect( _limitRect.x, _limitRect.y, _limitRect.width, _limitRect.height);//Empty drawn zone
 				//Draw border
+				m = new Matrix();
+				m.translate(_limitRect.x + 2, _limitRect.y + 2);
 				_limits.graphics.lineStyle(2, 0x0000cc);
+				_limits.graphics.beginBitmapFill(_patternLimit, m);
 				_limits.graphics.drawRect( _limitRect.x, _limitRect.y, _limitRect.width, _limitRect.height);
 			}
 			
@@ -536,7 +541,7 @@ package fr.durss.thermal.views {
 				src.graphics.drawRect(1, 0, _cellSize - 1, 1);
 				src.graphics.beginFill(0xff0000, 0);
 				src.graphics.drawRect(1, 1, _cellSize - 1, _cellSize - 1);
-				_pattern	= new BitmapData(src.width, src.height, true,0);
+				_pattern	= new BitmapData(src.width, src.height, true, 0);
 				_pattern.draw(src);
 			}else{
 				_pattern	= new BitmapData(1, 1, true, 0);
@@ -549,9 +554,21 @@ package fr.durss.thermal.views {
 			src.graphics.lineStyle(0, 0x777777, 1, true);
 			src.graphics.moveTo(10, 0);
 			src.graphics.lineTo(0, 10);
-			_patternDisable	= new BitmapData(src.width, src.height, true,0);
+			_patternDisable	= new BitmapData(src.width, src.height, true, 0);
 			_patternDisable.draw(src);
 			_patternDisable.lock();
+			
+			
+			//Creates/updates the limit zone pattern
+			src.graphics.clear();
+			src.graphics.beginFill(0xff0000, 0);
+			src.graphics.drawRect(0, 0, _cellSize, _cellSize);
+			src.graphics.endFill();
+			src.graphics.beginFill(0xcc0000, .5);
+			src.graphics.drawRect(_cellSize * 8 - 1, 0, 1, _cellSize);
+			_patternLimit	= new BitmapData(src.width, src.height, true, 0);
+			_patternLimit.draw(src);
+			_patternLimit.lock();
 			
 			
 			//Creates/updates zone pattern
@@ -563,7 +580,7 @@ package fr.durss.thermal.views {
 			src.graphics.lineTo(-1-7.5, 16);
 			src.graphics.moveTo(16+7.5, -1);
 			src.graphics.lineTo(-1+7.5, 16);
-			_patternZone	= new BitmapData(15, 15, true,0);
+			_patternZone	= new BitmapData(15, 15, true, 0);
 			_patternZone.draw(src);
 			_patternZone.lock();
 			

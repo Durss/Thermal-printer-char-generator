@@ -74,6 +74,9 @@ package fr.durss.thermal.views {
 		override public function update(event:IModelEvent):void {
 			var model:Model = event.model as Model;
 			_zoneBt.enabled = model.currentMode == Mode.MODE_BITMAP_DRAW;
+			if(model.currentMode == Mode.MODE_FONT_GLYPH && _group.selectedItem == _zoneBt) {
+				_pencilBt.selected = true;
+			}
 		}
 
 
