@@ -16,7 +16,7 @@ But you can definitely tweak it to use it with or without any other library.
 If you don't know how to do that, you can copy/paste the file from this repository (see "Adafruit_Thermal.h" file) into your local libraries.
 
 #### As of Arduino IDE 2017, you should find your local libraries at this location on Windows :
-C:\Users\{YOUR USER NAME}\Documents\Arduino\libraries\Adafruit_Thermal
+C:\Users\\{YOUR USER NAME}\Documents\Arduino\libraries\Adafruit_Thermal
 
 It probably has changed now.
 
