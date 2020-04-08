@@ -26,5 +26,3 @@ http://www.durss.ninja/projects/thermal-printer-code-generator/app/
 
 
 Enjoy !
-
-***[2018 EDIT]** Damn i miss the simplicity flash, 4 years after, piece of cake to update and compile T_T)*
